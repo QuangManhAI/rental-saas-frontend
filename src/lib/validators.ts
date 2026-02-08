@@ -36,8 +36,8 @@ export type PropertyFormValues = z.infer<typeof propertySchema>;
 
 export const roomSchema = z.object({
   name: z.string().min(1, 'Tên phòng là bắt buộc'),
-  price: z.number().min(0, 'Giá phải >= 0'),
-  area: z.number().min(0).optional(),
+  price: z.coerce.number().min(0, 'Giá phải >= 0'),
+  area: z.coerce.number().min(0).optional(),
   propertyId: z.string().min(1, 'Chọn nhà trọ'),
   description: z.string().optional(),
   status: z.nativeEnum(RoomStatus).optional(),
@@ -67,8 +67,8 @@ export const contractSchema = z.object({
   tenantId: z.string().min(1, 'Chọn khách thuê'),
   startDate: z.string().min(1, 'Ngày bắt đầu là bắt buộc'),
   endDate: z.string().min(1, 'Ngày kết thúc là bắt buộc'),
-  deposit: z.number().min(0).optional(),
-  rentPrice: z.number().min(0, 'Giá thuê phải >= 0'),
+  deposit: z.coerce.number().min(0).optional(),
+  rentPrice: z.coerce.number().min(0, 'Giá thuê phải >= 0'),
 });
 export type ContractFormValues = z.infer<typeof contractSchema>;
 
@@ -78,15 +78,15 @@ export type ContractFormValues = z.infer<typeof contractSchema>;
 
 export const billSchema = z.object({
   contractId: z.string().min(1, 'Chọn hợp đồng'),
-  month: z.number().min(1).max(12),
-  year: z.number().min(2020),
-  electricOldIndex: z.number().min(0),
-  electricNewIndex: z.number().min(0),
-  electricRate: z.number().min(0),
-  waterOldIndex: z.number().min(0),
-  waterNewIndex: z.number().min(0),
-  waterRate: z.number().min(0),
-  otherFee: z.number().min(0).optional(),
+  month: z.coerce.number().min(1).max(12),
+  year: z.coerce.number().min(2020),
+  electricOldIndex: z.coerce.number().min(0),
+  electricNewIndex: z.coerce.number().min(0),
+  electricRate: z.coerce.number().min(0),
+  waterOldIndex: z.coerce.number().min(0),
+  waterNewIndex: z.coerce.number().min(0),
+  waterRate: z.coerce.number().min(0),
+  otherFee: z.coerce.number().min(0).optional(),
 });
 export type BillFormValues = z.infer<typeof billSchema>;
 
@@ -96,7 +96,7 @@ export type BillFormValues = z.infer<typeof billSchema>;
 
 export const paymentSchema = z.object({
   billId: z.string().min(1, 'Chọn hoá đơn'),
-  amount: z.number().min(1, 'Số tiền tối thiểu là 1'),
+  amount: z.coerce.number().min(1, 'Số tiền tối thiểu là 1'),
   method: z.nativeEnum(PaymentMethod).optional(),
   note: z.string().optional(),
 });
