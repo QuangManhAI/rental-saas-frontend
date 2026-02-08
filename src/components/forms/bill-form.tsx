@@ -23,7 +23,7 @@ interface BillFormProps {
 
 export function BillForm({ contracts, onSubmit, loading }: BillFormProps) {
   const form = useForm<BillFormValues>({
-    resolver: zodResolver(billSchema),
+    resolver: zodResolver(billSchema) as any,
     defaultValues: {
       contractId: '',
       month: new Date().getMonth() + 1,

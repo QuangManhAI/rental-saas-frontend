@@ -30,7 +30,7 @@ export function ContractForm({
   loading,
 }: ContractFormProps) {
   const form = useForm<ContractFormValues>({
-    resolver: zodResolver(contractSchema),
+    resolver: zodResolver(contractSchema) as any,
     defaultValues: {
       roomId: '',
       tenantId: '',

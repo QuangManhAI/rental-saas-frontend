@@ -27,7 +27,7 @@ export function PaymentForm({
   loading,
 }: PaymentFormProps) {
   const form = useForm<PaymentFormValues>({
-    resolver: zodResolver(paymentSchema),
+    resolver: zodResolver(paymentSchema) as any,
     defaultValues: {
       billId: defaultBillId ?? '',
       amount: 0,
