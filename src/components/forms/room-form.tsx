@@ -32,7 +32,7 @@ export function RoomForm({
   submitLabel = 'Lưu',
 }: RoomFormProps) {
   const form = useForm<RoomFormValues>({
-    resolver: zodResolver(roomSchema) as any,
+    resolver: zodResolver(roomSchema) as any as any,
     defaultValues: {
       name: '',
       price: 0,
