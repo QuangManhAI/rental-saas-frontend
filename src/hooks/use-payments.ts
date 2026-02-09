@@ -2,9 +2,16 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { paymentsService } from '@/services';
+import { paymentsService, PaymentFilters } from '@/services/payments.service';
 import { queryKeys } from '@/constants';
 import type { CreatePaymentRequest } from '@/types';
+
+export function usePayments(filters?: PaymentFilters) {
+  return useQuery({
+    queryKey: ['payments', filters],
+    queryFn: () => paymentsService.getAll(filters),
+  });
+}
 
 export function usePaymentsByBill(billId: string) {
   return useQuery({

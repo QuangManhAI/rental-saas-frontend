@@ -4,14 +4,19 @@ import { use, useState } from 'react';
 import { useBill } from '@/hooks/use-bills';
 import { usePaymentsByBill, useCreatePayment, useDeletePayment } from '@/hooks/use-payments';
 import { PageHeader, LoadingSkeleton, StatusBadge, ConfirmDialog, EmptyState } from '@/components/shared';
-import { PaymentForm } from '@/components/forms';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from '@/components/ui/dialog';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { Plus } from 'lucide-react';
+import { Banknote, Loader2 } from 'lucide-react';
+import { PaymentMethod } from '@/types/enums';
 
 export default function BillDetailPage({
   params,
@@ -23,12 +28,34 @@ export default function BillDetailPage({
   const { data: payments, isLoading: paymentsLoading } = usePaymentsByBill(id);
   const createPayment = useCreatePayment();
   const deletePayment = useDeletePayment(id);
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
+
+  const [showCashModal, setShowCashModal] = useState(false);
+  const [cashAmount, setCashAmount] = useState('');
 
   if (isLoading) return <LoadingSkeleton />;
   if (!bill) return <p className="p-6">Không tìm thấy hoá đơn.</p>;
 
   const remaining = bill.totalAmount - bill.paidAmount;
+
+  const handleCashPayment = () => {
+    const amount = parseFloat(cashAmount);
+    if (isNaN(amount) || amount <= 0) return;
+
+    createPayment.mutate(
+      {
+        billId: id,
+        amount,
+        method: PaymentMethod.CASH,
+        note: 'Thanh toán tiền mặt',
+      },
+      {
+        onSuccess: () => {
+          setShowCashModal(false);
+          setCashAmount('');
+        },
+      }
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -118,28 +145,17 @@ export default function BillDetailPage({
           {remaining > 0 && (
             <Button
               size="sm"
-              onClick={() => setShowPaymentForm(!showPaymentForm)}
+              onClick={() => {
+                setCashAmount(remaining.toString());
+                setShowCashModal(true);
+              }}
             >
-              <Plus className="mr-2 h-4 w-4" />
-              Thanh toán
+              <Banknote className="mr-2 h-4 w-4" />
+              Thanh toán tiền mặt
             </Button>
           )}
         </CardHeader>
         <CardContent className="space-y-4">
-          {showPaymentForm && (
-            <div className="rounded-md border p-4">
-              <PaymentForm
-                defaultBillId={id}
-                onSubmit={(d) => {
-                  createPayment.mutate(d, {
-                    onSuccess: () => setShowPaymentForm(false),
-                  });
-                }}
-                loading={createPayment.isPending}
-              />
-            </div>
-          )}
-
           {paymentsLoading ? (
             <LoadingSkeleton rows={2} />
           ) : !payments?.length ? (
@@ -177,6 +193,53 @@ export default function BillDetailPage({
           )}
         </CardContent>
       </Card>
+
+      {/* Cash Payment Modal */}
+      <Dialog open={showCashModal} onOpenChange={setShowCashModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Thanh toán tiền mặt</DialogTitle>
+            <DialogDescription>
+              Ghi nhận thanh toán tiền mặt cho hoá đơn này
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="cashAmount">Số tiền (₫)</Label>
+              <Input
+                id="cashAmount"
+                type="number"
+                min={1}
+                max={remaining}
+                value={cashAmount}
+                onChange={(e) => setCashAmount(e.target.value)}
+                placeholder={`Tối đa ${formatCurrency(remaining)}`}
+              />
+              <p className="text-sm text-muted-foreground">
+                Còn lại: {formatCurrency(remaining)}
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowCashModal(false)}
+            >
+              Huỷ
+            </Button>
+            <Button
+              onClick={handleCashPayment}
+              disabled={createPayment.isPending || !cashAmount}
+            >
+              {createPayment.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Xác nhận
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+

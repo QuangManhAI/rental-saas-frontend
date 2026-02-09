@@ -7,7 +7,7 @@ import {
   Receipt,
   CreditCard,
   UserCog,
-  UserCheck,
+  Settings,
   type LucideIcon,
 } from 'lucide-react';
 import { ROUTES } from './routes';
@@ -43,11 +43,6 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Users,
   },
   {
-    label: 'Khách hàng',
-    href: ROUTES.CUSTOMERS,
-    icon: UserCheck,
-  },
-  {
     label: 'Hợp đồng',
     href: ROUTES.CONTRACTS,
     icon: FileText,
@@ -58,9 +53,15 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Receipt,
   },
   {
-    label: 'Thanh toán',
-    href: ROUTES.PAYMENT_NEW,
+    label: 'Giao dịch',
+    href: ROUTES.PAYMENTS,
     icon: CreditCard,
+  },
+  {
+    label: 'Cài đặt TT',
+    href: ROUTES.PAYMENT_SETTINGS,
+    icon: Settings,
+    roles: [Role.OWNER],
   },
   {
     label: 'Nhân viên',
@@ -69,3 +70,4 @@ export const NAV_ITEMS: NavItem[] = [
     roles: [Role.OWNER],
   },
 ];
+

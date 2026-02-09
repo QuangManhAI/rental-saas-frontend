@@ -24,10 +24,6 @@ export const queryKeys = {
     all: ['tenants'] as const,
     detail: (id: string) => ['tenants', id] as const,
   },
-  customers: {
-    all: ['customers'] as const,
-    detail: (id: string) => ['customers', id] as const,
-  },
   contracts: {
     all: ['contracts'] as const,
     detail: (id: string) => ['contracts', id] as const,
@@ -39,4 +35,8 @@ export const queryKeys = {
   payments: {
     byBill: (billId: string) => ['payments', 'bill', billId] as const,
   },
+  paymentSettings: {
+    current: ['paymentSettings'] as const,
+  },
 } as const;
+

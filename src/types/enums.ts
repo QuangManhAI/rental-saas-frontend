@@ -29,5 +29,14 @@ export enum BillStatus {
 export enum PaymentMethod {
   CASH = 'CASH',
   TRANSFER = 'TRANSFER',
+  MOMO = 'MOMO',
+  VNPAY = 'VNPAY',
   OTHER = 'OTHER',
 }
+
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+}
+

@@ -39,18 +39,13 @@ export const ROUTES = {
   BILL_DETAIL: (id: string) => `/bills/${id}` as const,
 
   // Payments
-  PAYMENT_NEW: '/payments/new',
+  PAYMENTS: '/payments',
+  PAYMENT_SETTINGS: '/payment-settings',
 
   // Users (staff management)
   USERS: '/users',
   USER_NEW: '/users/new',
   USER_EDIT: (id: string) => `/users/${id}/edit` as const,
-
-  // Customers
-  CUSTOMERS: '/customers',
-  CUSTOMER_NEW: '/customers/new',
-  CUSTOMER_DETAIL: (id: string) => `/customers/${id}` as const,
-  CUSTOMER_EDIT: (id: string) => `/customers/${id}/edit` as const,
 
   // Profile
   PROFILE: '/profile',
