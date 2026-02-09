@@ -30,7 +30,7 @@ export function ContractForm({
   loading,
 }: ContractFormProps) {
   const form = useForm<ContractFormValues>({
-    resolver: zodResolver(contractSchema) as any as any,
+    resolver: zodResolver(contractSchema) as any,
     defaultValues: {
       roomId: '',
       tenantId: '',
@@ -45,16 +45,21 @@ export function ContractForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-xl">
+        {/* Room Selection */}
         <FormField
           control={form.control}
           name="roomId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Phòng (chỉ phòng trống)</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value}
+                disabled={rooms.length === 0}
+              >
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Chọn phòng" />
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={rooms.length === 0 ? "Không có phòng trống" : "Chọn phòng"} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -70,16 +75,21 @@ export function ContractForm({
           )}
         />
 
+        {/* Tenant Selection */}
         <FormField
           control={form.control}
           name="tenantId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Khách thuê</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value}
+                disabled={tenants.length === 0}
+              >
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Chọn khách thuê" />
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={tenants.length === 0 ? "Không có khách thuê" : "Chọn khách thuê"} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>

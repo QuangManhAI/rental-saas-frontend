@@ -23,10 +23,9 @@ export function useUpsertPaymentSettings() {
     return useMutation({
         mutationFn: (dto: UpsertPaymentSettingsDto) =>
             paymentSettingsService.upsert(dto),
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: queryKeys.paymentSettings.current,
-            });
+        onSuccess: (data) => {
+            // Optimistically update the cache with the returned data
+            queryClient.setQueryData(queryKeys.paymentSettings.current, data);
             toast.success('Cài đặt thanh toán đã được lưu');
         },
         onError: (error: any) => {

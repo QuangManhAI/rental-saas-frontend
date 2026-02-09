@@ -34,7 +34,10 @@ export function useCreateContract() {
       toast.success('Tạo hợp đồng thành công');
       router.push(ROUTES.CONTRACTS);
     },
-    onError: () => toast.error('Tạo hợp đồng thất bại'),
+    onError: (error: any) => {
+      const message = error.response?.data?.message || 'Tạo hợp đồng thất bại';
+      toast.error(message);
+    },
   });
 }
 
@@ -49,6 +52,9 @@ export function useTerminateContract() {
       qc.invalidateQueries({ queryKey: ['rooms'] });
       toast.success('Thanh lý hợp đồng thành công');
     },
-    onError: () => toast.error('Thanh lý hợp đồng thất bại'),
+    onError: (error: any) => {
+      const message = error.response?.data?.message || 'Thanh lý hợp đồng thất bại';
+      toast.error(message);
+    },
   });
 }

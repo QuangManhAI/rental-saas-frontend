@@ -4,6 +4,9 @@ import { use } from 'react';
 import { useContract, useTerminateContract } from '@/hooks/use-contracts';
 import { PageHeader, LoadingSkeleton, StatusBadge, ConfirmDialog } from '@/components/shared';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Copy } from 'lucide-react';
+import { toast } from 'sonner';
 import { formatCurrency, formatDate } from '@/lib/utils';
 
 export default function ContractDetailPage({
@@ -57,16 +60,53 @@ export default function ContractDetailPage({
             <p className="font-medium">{formatDate(data.endDate)}</p>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Mã phòng</p>
-            <p className="font-mono text-sm">{data.roomId}</p>
+            <p className="text-sm text-muted-foreground">Phòng</p>
+            <p className="font-medium">
+              {typeof data.roomId === 'object' ? data.roomId.name : data.roomId}
+            </p>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Mã khách thuê</p>
-            <p className="font-mono text-sm">{data.tenantId}</p>
+            <p className="text-sm text-muted-foreground">Khách thuê</p>
+            <p className="font-medium">
+              {typeof data.tenantId === 'object' ? data.tenantId.fullName : data.tenantId}
+            </p>
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Ngày tạo</p>
             <p className="font-medium">{formatDate(data.createdAt)}</p>
+          </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Kết nối Telegram</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col gap-2">
+            <p className="text-sm text-muted-foreground">
+              Chia sẻ liên kết này cho khách thuê để nhận thông báo hóa đơn và thanh toán online:
+            </p>
+            {data.telegramLink ? (
+              <div className="flex items-center gap-2">
+                <div className="flex-1 p-3 bg-muted rounded-md border text-sm font-mono break-all">
+                  {data.telegramLink}
+                </div>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    navigator.clipboard.writeText(data.telegramLink!);
+                    toast.success('Đã sao chép liên kết');
+                  }}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <p className="text-sm text-yellow-600">
+                Không có liên kết Telegram.
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
