@@ -6,7 +6,7 @@ import { AppProviders } from '@/providers/app-providers';
 const inter = Inter({ subsets: ['latin', 'vietnamese'] });
 
 export const metadata: Metadata = {
-  title: 'Rental SaaS — Quản lý nhà trọ',
+  title: 'Rental Saas for Q_Manh',
   description: 'Hệ thống quản lý nhà trọ chuyên nghiệp',
 };
 
