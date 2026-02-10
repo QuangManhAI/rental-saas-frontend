@@ -7,6 +7,8 @@ import { useLogin } from '@/hooks/use-auth';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export default function LoginPage() {
   const login = useLogin();
@@ -22,115 +24,120 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex overflow-hidden bg-white">
+    <div className="min-h-screen w-full flex overflow-hidden bg-white selection:bg-indigo-100 selection:text-indigo-900">
 
       {/* Left Panel - Image (Hidden on mobile, 55% width on large screens) */}
-      <div className="hidden lg:block lg:w-[55%] relative overflow-hidden">
+      <div className="hidden lg:block lg:w-[55%] relative overflow-hidden bg-indigo-950">
         <img
           src="/hd.jpg"
           alt="Luxury Pool"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover opacity-90"
         />
-        <div className="absolute inset-0 bg-indigo-900/10 mix-blend-multiply" />
+        {/* Subtle Gradient Overlay - Lighter (40-55%) to reveal image details */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/60 via-indigo-800/50 to-indigo-900/60 mix-blend-multiply" />
+
+        {/* Quote / Brand Overlay */}
+        <div className="absolute bottom-20 left-20 z-20 max-w-xl">
+          <h2 className="text-4xl font-bold text-white mb-6 leading-tight drop-shadow-md">
+            "The most efficient way to manage your rental properties."
+          </h2>
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-1 bg-white/30 rounded-full" />
+            <p className="text-indigo-100 font-medium drop-shadow-sm">Rental SaaS Platform</p>
+          </div>
+        </div>
       </div>
 
       {/* Right Panel - Login Form (Full width mobile, 45% desktop) */}
-      <div className="w-full lg:w-[45%] bg-[#FDF9FF] flex items-center justify-center p-8 relative">
+      <div className="w-full lg:w-[45%] bg-white flex items-center justify-center p-8 relative">
 
-        {/* --- Decorative Elements (Absolute positioned within right panel) --- */}
+        {/* Decorative Blue Blurred Circle (Top Right of Panel) */}
+        <div className="absolute -top-[100px] -right-[50px] w-[300px] h-[300px] bg-[#4F46E5] rounded-full blur-[80px] opacity-5 pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[65%] h-[70%] border border-slate-900/75 rounded-[2rem] pointer-events-none hidden md:block scale-95" />
+        {/* Main Content Wrapper - Relative for decorations */}
+        <div className="relative w-full max-w-[420px]">
 
-        {/* Blue Circle Top Right */}
-        <div className="absolute -top-[100px] -right-[90px] w-[229px] h-[229px] bg-[#4F46E5] rounded-full blur-2xl opacity-20 lg:opacity-100 lg:blur-none shadow-lg z-0 scale-80" />
+          <div className="space-y-10">
+            <div className="space-y-3 text-left">
+              <h1 className="text-[40px] leading-tight font-bold text-slate-900 tracking-tight">
+                Welcome Back
+              </h1>
+              <p className="text-slate-500 text-lg">
+                Sign in to your dashboard
+              </p>
+            </div>
 
-        {/* Center Outline Box (Subtle background decoration) */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[65%] h-[70%] border border-slate-900/75 rounded-[2rem] pointer-events-none hidden md:block scale-80" />
-
-
-        {/* --- Main Login Content --- */}
-        <div className="max-w-[480px] w-full z-10 space-y-8 scale-75 origin-center">
-
-          <div className="text-left space-y-2">
-            <h1 className="text-[48px] leading-none font-normal text-black font-sans">
-              Hello!
-            </h1>
-            <p className="text-[32px] leading-tight font-light text-black font-sans">
-              sign in to RePOs
-            </p>
-          </div>
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <div className="relative">
-                        <input
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        {/* Using System Input Component */}
+                        <Input
                           {...field}
-                          placeholder="Email"
-                          className="w-full h-[71px] rounded-[40px] bg-[#EEEEEE] shadow-[inset_0_4px_4px_rgba(0,0,0,0.05)] border-none px-8 text-[24px] text-black placeholder:text-black/20 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/50 transition-all font-light"
+                          placeholder="Email address"
+                          className="h-12 text-lg bg-white shadow-sm border-slate-200"
                         />
-                      </div>
-                    </FormControl>
-                    <FormMessage className="ml-6 text-red-500" />
-                  </FormItem>
-                )}
-              />
+                      </FormControl>
+                      <FormMessage className="ml-1" />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <div className="relative">
-                        <input
-                          {...field}
-                          type={showPassword ? 'text' : 'password'}
-                          placeholder="Password"
-                          className="w-full h-[71px] rounded-[40px] bg-[#EEEEEE] shadow-[inset_0_4px_4px_rgba(0,0,0,0.05)] border-none px-8 pr-16 text-[24px] text-black placeholder:text-black/20 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/50 transition-all font-light"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-6 top-1/2 -translate-y-1/2 text-black/30 hover:text-[#4F46E5] transition-colors"
-                        >
-                          {showPassword ? <EyeOff size={28} /> : <Eye size={28} />}
-                        </button>
-                      </div>
-                    </FormControl>
-                    <FormMessage className="ml-6 text-red-500" />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <div className="relative group">
+                          <Input
+                            {...field}
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Password"
+                            className="h-12 text-lg bg-white shadow-sm border-slate-200 pr-12"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition-colors"
+                          >
+                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </button>
+                        </div>
+                      </FormControl>
+                      <FormMessage className="ml-1" />
+                    </FormItem>
+                  )}
+                />
 
-              <button
-                type="submit"
-                disabled={login.isPending}
-                className="w-full h-[59px] rounded-[40px] bg-[#4F46E5] hover:bg-[#4338ca] text-white text-[32px] font-normal flex items-center justify-center transition-all active:scale-[0.98] shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
+                <Button
+                  type="submit"
+                  disabled={login.isPending}
+                  size="lg"
+                  className="w-full h-12 text-lg font-semibold rounded-xl shadow-indigo-500/20 shadow-lg hover:shadow-indigo-500/30 transition-all hover:-translate-y-0.5"
+                >
+                  {login.isPending ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    'Sign In'
+                  )}
+                </Button>
+              </form>
+            </Form>
+
+            <div className="text-center">
+              <a
+                href="#"
+                className="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors"
               >
-                {login.isPending ? (
-                  <Loader2 className="w-8 h-8 animate-spin" />
-                ) : (
-                  'sign in'
-                )}
-              </button>
-
-            </form>
-          </Form>
-
-          <div className="text-center pt-4">
-            <a
-              href="#"
-              className="text-[18px] text-black underline decoration-1 underline-offset-4 hover:text-[#4F46E5] transition-colors"
-            >
-              Forgot information - Contact to Admin
-            </a>
+                Forgot password? Contact Support
+              </a>
+            </div>
           </div>
-
         </div>
       </div>
     </div>
