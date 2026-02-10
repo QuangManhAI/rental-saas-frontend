@@ -25,6 +25,7 @@ import {
   Link,
 } from 'lucide-react';
 import { LoadingSkeleton } from '@/components/shared';
+import DashboardAnalytics from '@/components/dashboard/DashboardAnalytics';
 import { toast } from 'sonner';
 
 export default function DashboardPage() {
@@ -123,6 +124,7 @@ export default function DashboardPage() {
       value: properties?.length ?? 0,
       icon: Building2,
       color: 'text-blue-600',
+      bgColor: 'bg-blue-100/50',
     },
     {
       label: 'Phòng trống / Tổng',
@@ -130,12 +132,14 @@ export default function DashboardPage() {
       sub: `${occupiedRooms} đang thuê`,
       icon: DoorOpen,
       color: 'text-green-600',
+      bgColor: 'bg-green-100/50',
     },
     {
       label: 'Hợp đồng đang hoạt động',
       value: activeContracts,
       icon: FileText,
       color: 'text-purple-600',
+      bgColor: 'bg-purple-100/50',
     },
     {
       label: 'Hoá đơn chưa thu',
@@ -143,6 +147,7 @@ export default function DashboardPage() {
       sub: formatCurrency(unpaidTotal),
       icon: Receipt,
       color: 'text-red-600',
+      bgColor: 'bg-red-100/50',
     },
   ];
 
@@ -218,10 +223,12 @@ export default function DashboardPage() {
         {stats.map((stat) => (
           <Card key={stat.label}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+              <CardTitle className="text-sm font-medium text-slate-500">
                 {stat.label}
               </CardTitle>
-              <stat.icon className={`h-5 w-5 ${stat.color}`} />
+              <div className={`p-2 rounded-full ${stat.bgColor}`}>
+                <stat.icon className={`h-5 w-5 ${stat.color}`} />
+              </div>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">{stat.value}</p>
@@ -234,6 +241,9 @@ export default function DashboardPage() {
           </Card>
         ))}
       </div>
+
+      {/* Analytics Charts */}
+      <DashboardAnalytics />
     </div>
   );
 }
