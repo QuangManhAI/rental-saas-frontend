@@ -40,14 +40,14 @@ export default function LoginPage() {
         {/* --- Decorative Elements (Absolute positioned within right panel) --- */}
 
         {/* Blue Circle Top Right */}
-        <div className="absolute -top-[100px] -right-[50px] w-[229px] h-[229px] bg-[#4F46E5] rounded-full blur-2xl opacity-20 lg:opacity-100 lg:blur-none shadow-lg z-0" />
+        <div className="absolute -top-[100px] -right-[90px] w-[229px] h-[229px] bg-[#4F46E5] rounded-full blur-2xl opacity-20 lg:opacity-100 lg:blur-none shadow-lg z-0 scale-80" />
 
         {/* Center Outline Box (Subtle background decoration) */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[65%] h-[70%] border border-slate-900/75 rounded-[2rem] pointer-events-none hidden md:block" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[65%] h-[70%] border border-slate-900/75 rounded-[2rem] pointer-events-none hidden md:block scale-80" />
 
 
         {/* --- Main Login Content --- */}
-        <div className="max-w-[480px] w-full z-10 space-y-8 scale-55 origin-center">
+        <div className="max-w-[480px] w-full z-10 space-y-8 scale-75 origin-center">
 
           <div className="text-left space-y-2">
             <h1 className="text-[48px] leading-none font-normal text-black font-sans">
