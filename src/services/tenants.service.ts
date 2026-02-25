@@ -1,6 +1,7 @@
 import api from '@/lib/axios';
 import {
   ApiResponse,
+  PaginatedResult,
   Tenant,
   CreateTenantRequest,
   UpdateTenantRequest,
@@ -13,7 +14,7 @@ export const tenantsService = {
     api.post<ApiResponse<Tenant>>(BASE, data).then((r) => r.data.data),
 
   findAll: () =>
-    api.get<ApiResponse<Tenant[]>>(BASE).then((r) => r.data.data),
+    api.get<ApiResponse<PaginatedResult<Tenant>>>(BASE).then((r) => r.data.data.data),
 
   findOne: (id: string) =>
     api.get<ApiResponse<Tenant>>(`${BASE}/${id}`).then((r) => r.data.data),

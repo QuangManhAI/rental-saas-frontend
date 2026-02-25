@@ -1,6 +1,8 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { toast } from 'sonner';
+import { triggerUpgradeDialog } from '@/components/shared/upgrade-dialog';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -35,7 +37,7 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config;
 });
 
-// ─── RESPONSE: silent refresh on 401 ────
+// ─── RESPONSE: silent refresh on 401, toast for 402/403/500 ────
 let isRefreshing = false;
 let failedQueue: {
   resolve: (token: string) => void;
@@ -50,6 +52,12 @@ function processQueue(error: unknown, token: string | null) {
   failedQueue = [];
 }
 
+function extractMessage(error: AxiosError): string {
+  const data = error.response?.data as { message?: string | string[] } | undefined;
+  if (!data?.message) return 'Có lỗi xảy ra. Vui lòng thử lại.';
+  return Array.isArray(data.message) ? data.message[0] : data.message;
+}
+
 api.interceptors.response.use(
   (res) => res,
   async (error: AxiosError) => {
@@ -57,8 +65,29 @@ api.interceptors.response.use(
       _retry?: boolean;
     };
 
-    // Only attempt refresh for 401 and not already retried
-    if (error.response?.status !== 401 || originalRequest._retry) {
+    const status = error.response?.status;
+
+    // ── 402: Plan limit exceeded ─────────────────────────────────────────────
+    if (status === 402) {
+      const msg = extractMessage(error);
+      triggerUpgradeDialog(msg);
+      return Promise.reject(error);
+    }
+
+    // ── 403: Forbidden ───────────────────────────────────────────────────────
+    if (status === 403) {
+      toast.error('Bạn không có quyền thực hiện thao tác này.');
+      return Promise.reject(error);
+    }
+
+    // ── 500+: Server error ────────────────────────────────────────────────────
+    if (status && status >= 500) {
+      toast.error('Có lỗi xảy ra trên máy chủ. Vui lòng thử lại sau.');
+      return Promise.reject(error);
+    }
+
+    // ── 401: Attempt silent token refresh ────────────────────────────────────
+    if (status !== 401 || originalRequest._retry) {
       return Promise.reject(error);
     }
 
@@ -70,7 +99,6 @@ api.interceptors.response.use(
     }
 
     if (isRefreshing) {
-      // Queue this request until the refresh completes
       return new Promise<string>((resolve, reject) => {
         failedQueue.push({ resolve, reject });
       }).then((token) => {

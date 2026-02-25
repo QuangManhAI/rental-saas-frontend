@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import {
@@ -13,6 +13,7 @@ import {
   AlertCircle,
   LogOut,
   Send,
+  ArrowLeft,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,7 @@ import { LoadingSkeleton } from '@/components/shared';
 import { useAuthStore } from '@/stores/auth.store';
 import { useProfile } from '@/hooks/use-auth';
 import { usersService } from '@/services/users.service';
+import { authService } from '@/services/auth.service';
 import { Role } from '@/types/enums';
 
 // --- Types ---
@@ -219,27 +221,113 @@ function GeneralTab({ user, onUpdate }: { user: any; onUpdate: () => void }) {
 }
 
 function SecurityTab({ user }: { user: any }) {
-  // Demo state for 2FA
-  const [twoFactor, setTwoFactor] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [otpStep, setOtpStep] = useState(false);
+  const [passwordData, setPasswordData] = useState<{ currentPassword: string; newPassword: string } | null>(null);
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [countdown, setCountdown] = useState(0);
+  const [canResend, setCanResend] = useState(false);
+  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const { register, handleSubmit, reset } = useForm();
+
+  useEffect(() => {
+    if (countdown <= 0) {
+      setCanResend(true);
+      return;
+    }
+    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [countdown]);
 
   const onChangePassword = async (data: any) => {
     if (data.newPassword !== data.confirmPassword) {
       toast.error('Mật khẩu xác nhận không khớp');
       return;
     }
+    if (data.newPassword.length < 6) {
+      toast.error('Mật khẩu mới phải có ít nhất 6 ký tự');
+      return;
+    }
 
     setLoading(true);
     try {
-      // Assuming usersService.update handles password change if provided
-      // Note: Real implementation usually requires current password verification on backend
-      await usersService.update(user._id, { password: data.newPassword });
+      await authService.requestChangePasswordOtp();
+      setPasswordData({ currentPassword: data.currentPassword, newPassword: data.newPassword });
+      setOtpStep(true);
+      setCountdown(60);
+      setCanResend(false);
+      setOtp(['', '', '', '', '', '']);
+      toast.success('Mã OTP đã được gửi đến email của bạn');
+      setTimeout(() => otpRefs.current[0]?.focus(), 100);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'Lỗi khi gửi OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    const newOtp = [...otp];
+
+    if (value.length > 1) {
+      const digits = value.slice(0, 6).split('');
+      digits.forEach((d, i) => {
+        if (index + i < 6) newOtp[index + i] = d;
+      });
+      setOtp(newOtp);
+      const nextIndex = Math.min(index + digits.length, 5);
+      otpRefs.current[nextIndex]?.focus();
+      if (newOtp.every((d) => d !== '')) handleVerifyOtp(newOtp.join(''));
+      return;
+    }
+
+    newOtp[index] = value;
+    setOtp(newOtp);
+    if (value && index < 5) otpRefs.current[index + 1]?.focus();
+    if (newOtp.every((d) => d !== '')) handleVerifyOtp(newOtp.join(''));
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleVerifyOtp = async (code: string) => {
+    if (!passwordData) return;
+    setLoading(true);
+    try {
+      await authService.verifyChangePasswordOtp({
+        code,
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+      });
       toast.success('Đổi mật khẩu thành công');
+      setOtpStep(false);
+      setPasswordData(null);
+      setOtp(['', '', '', '', '', '']);
       reset();
-    } catch (error) {
-      toast.error('Lỗi khi đổi mật khẩu');
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'Mã OTP không đúng');
+      setOtp(['', '', '', '', '', '']);
+      otpRefs.current[0]?.focus();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setLoading(true);
+    try {
+      await authService.requestChangePasswordOtp();
+      setCountdown(60);
+      setCanResend(false);
+      setOtp(['', '', '', '', '', '']);
+      toast.success('Đã gửi lại mã OTP');
+    } catch (error: any) {
+      toast.error('Không thể gửi lại mã OTP');
     } finally {
       setLoading(false);
     }
@@ -253,56 +341,115 @@ function SecurityTab({ user }: { user: any }) {
       </CardHeader>
       <CardContent className="space-y-6">
 
-        {/* Password Change Form */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-medium text-slate-900 uppercase tracking-wider">Đổi mật khẩu</h3>
-          <form onSubmit={handleSubmit(onChangePassword)} className="space-y-3 max-w-md">
-            <div className="grid gap-2">
-              <Label htmlFor="currentPassword">Mật khẩu hiện tại</Label>
-              <Input type="password" id="currentPassword" required className="focus:ring-indigo-500" />
+        {!otpStep ? (
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium text-slate-900 uppercase tracking-wider">Đổi mật khẩu</h3>
+            <form onSubmit={handleSubmit(onChangePassword)} className="space-y-3 max-w-md">
+              <div className="grid gap-2">
+                <Label htmlFor="currentPassword">Mật khẩu hiện tại</Label>
+                <Input
+                  type="password"
+                  id="currentPassword"
+                  {...register('currentPassword', { required: true })}
+                  className="focus:ring-indigo-500"
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="newPassword">Mật khẩu mới</Label>
+                <Input
+                  type="password"
+                  id="newPassword"
+                  {...register('newPassword', { required: true, minLength: 6 })}
+                  className="focus:ring-indigo-500"
+                />
+                <p className="text-xs text-muted-foreground">Tối thiểu 6 ký tự.</p>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="confirmPassword">Xác nhận mật khẩu mới</Label>
+                <Input
+                  type="password"
+                  id="confirmPassword"
+                  {...register('confirmPassword', { required: true })}
+                  className="focus:ring-indigo-500"
+                />
+              </div>
+
+              <Button type="submit" disabled={loading} className="mt-2">
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Cập nhật mật khẩu
+              </Button>
+            </form>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => { setOtpStep(false); setPasswordData(null); }}
+                className="text-sm text-slate-500 hover:text-indigo-600 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+              <h3 className="text-sm font-medium text-slate-900 uppercase tracking-wider">Xác thực OTP</h3>
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="newPassword">Mật khẩu mới</Label>
-              <Input
-                type="password"
-                id="newPassword"
-                {...register('newPassword', { required: true, minLength: 6 })}
-                className="focus:ring-indigo-500"
-              />
-              <p className="text-xs text-muted-foreground">Tối thiểu 6 ký tự.</p>
+            <p className="text-sm text-slate-500">
+              Nhập mã 6 số đã gửi đến email <span className="font-medium text-slate-700">{user.email}</span>
+            </p>
+
+            <div className="flex gap-3 justify-start">
+              {otp.map((digit, index) => (
+                <input
+                  key={index}
+                  ref={(el) => { otpRefs.current[index] = el; }}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={digit}
+                  onChange={(e) => handleOtpChange(index, e.target.value)}
+                  onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                  className="w-11 h-13 text-center text-lg font-bold border-2 border-slate-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                  disabled={loading}
+                />
+              ))}
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="confirmPassword">Xác nhận mật khẩu mới</Label>
-              <Input
-                type="password"
-                id="confirmPassword"
-                {...register('confirmPassword', { required: true })}
-                className="focus:ring-indigo-500"
-              />
-            </div>
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={() => handleVerifyOtp(otp.join(''))}
+                disabled={loading || otp.some((d) => !d)}
+              >
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Xác nhận
+              </Button>
 
-            <Button type="submit" disabled={loading} className="mt-2">
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Cập nhật mật khẩu
-            </Button>
-          </form>
-        </div>
+              <span className="text-sm text-slate-500">
+                {canResend ? (
+                  <button
+                    onClick={handleResendOtp}
+                    className="font-medium text-indigo-600 hover:text-indigo-700"
+                    disabled={loading}
+                  >
+                    Gửi lại mã
+                  </button>
+                ) : (
+                  <>Gửi lại sau {countdown}s</>
+                )}
+              </span>
+            </div>
+          </div>
+        )}
 
         <Separator />
 
-        {/* 2FA Section (Mock UI) */}
+        {/* 2FA Section */}
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <h3 className="font-medium text-slate-900">Xác thực hai lớp (2FA)</h3>
-            <p className="text-sm text-muted-foreground">Tăng cường bảo mật cho tài khoản của bạn.</p>
+            <h3 className="font-medium text-slate-900">Xác thực qua Email (OTP)</h3>
+            <p className="text-sm text-muted-foreground">Mã OTP được gửi qua email khi đổi mật khẩu.</p>
           </div>
-          <Switch
-            checked={twoFactor}
-            onCheckedChange={setTwoFactor}
-            className="data-[state=checked]:bg-indigo-600"
-          />
+          <Badge variant="default" className="bg-green-600">Đang bật</Badge>
         </div>
 
       </CardContent>

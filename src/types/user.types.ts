@@ -8,6 +8,8 @@ export interface User {
   role: Role;
   ownerId: string;
   isActive: boolean;
+  emailVerified?: boolean;
+  isOnboardingComplete?: boolean;
   createdAt: string;
   updatedAt: string;
 }

@@ -26,9 +26,8 @@ export interface UpsertPaymentSettingsDto {
 
 export const paymentSettingsService = {
     get: () =>
-        api.get<PaymentSettings>('/payment-settings').then((r) => r.data),
+        api.get<{ data: PaymentSettings }>('/payment-settings').then((r) => r.data.data),
 
     upsert: (dto: UpsertPaymentSettingsDto) =>
-        api.put<PaymentSettings>('/payment-settings', dto).then((r) => r.data),
+        api.put<{ data: PaymentSettings }>('/payment-settings', dto).then((r) => r.data.data),
 };
-

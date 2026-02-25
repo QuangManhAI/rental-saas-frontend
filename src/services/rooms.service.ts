@@ -1,5 +1,5 @@
 import api from '@/lib/axios';
-import { ApiResponse, Room, CreateRoomRequest, UpdateRoomRequest } from '@/types';
+import { ApiResponse, PaginatedResult, Room, CreateRoomRequest, UpdateRoomRequest } from '@/types';
 
 const BASE = '/rooms';
 
@@ -9,10 +9,10 @@ export const roomsService = {
 
   findAll: (propertyId?: string) =>
     api
-      .get<ApiResponse<Room[]>>(BASE, {
+      .get<ApiResponse<PaginatedResult<Room>>>(BASE, {
         params: propertyId ? { propertyId } : undefined,
       })
-      .then((r) => r.data.data),
+      .then((r) => r.data.data.data),
 
   findOne: (id: string) =>
     api.get<ApiResponse<Room>>(`${BASE}/${id}`).then((r) => r.data.data),

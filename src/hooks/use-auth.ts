@@ -7,6 +7,7 @@ import { authService } from '@/services';
 import { useAuthStore } from '@/stores/auth.store';
 import { queryKeys, ROUTES } from '@/constants';
 import type { LoginRequest, RegisterRequest } from '@/types';
+import { Role } from '@/types/enums';
 
 export function useLogin() {
   const router = useRouter();
@@ -18,7 +19,14 @@ export function useLogin() {
       setTokens(res.tokens.accessToken, res.tokens.refreshToken);
       setUser(res.user);
       toast.success('Đăng nhập thành công');
-      router.replace(ROUTES.DASHBOARD);
+      // Admin users go straight to the admin panel
+      if (res.user.role === Role.ADMIN) {
+        router.replace('/admin');
+      } else if (!res.user.isOnboardingComplete) {
+        router.replace(ROUTES.ONBOARDING);
+      } else {
+        router.replace(ROUTES.DASHBOARD);
+      }
     },
     onError: () => {
       toast.error('Email hoặc mật khẩu không đúng');
@@ -35,8 +43,8 @@ export function useRegister() {
     onSuccess: (res) => {
       setTokens(res.tokens.accessToken, res.tokens.refreshToken);
       setUser(res.user);
-      toast.success('Đăng ký thành công');
-      router.replace(ROUTES.DASHBOARD);
+      toast.success('Đăng ký thành công! Hãy kiểm tra email để xác thực.');
+      router.replace(ROUTES.ONBOARDING);
     },
     onError: () => {
       toast.error('Đăng ký thất bại. Email có thể đã tồn tại.');

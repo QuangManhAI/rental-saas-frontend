@@ -1,5 +1,5 @@
 import api from '@/lib/axios';
-import { ApiResponse, Bill, CreateBillRequest } from '@/types';
+import { ApiResponse, PaginatedResult, Bill, CreateBillRequest } from '@/types';
 
 const BASE = '/bills';
 
@@ -8,7 +8,7 @@ export const billsService = {
     api.post<ApiResponse<Bill>>(BASE, data).then((r) => r.data.data),
 
   findAll: () =>
-    api.get<ApiResponse<Bill[]>>(BASE).then((r) => r.data.data),
+    api.get<ApiResponse<PaginatedResult<Bill>>>(BASE).then((r) => r.data.data.data),
 
   findOne: (id: string) =>
     api.get<ApiResponse<Bill>>(`${BASE}/${id}`).then((r) => r.data.data),

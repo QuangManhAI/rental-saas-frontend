@@ -1,4 +1,6 @@
-export { authService } from './auth.service';
+export { authService, onboardingService } from './auth.service';
+export { adminService } from './admin.service';
+export type { AdminStats, AdminUser, AdminSubscription, AdminHealth, PaginatedResult } from './admin.service';
 export { usersService } from './users.service';
 export { propertiesService } from './properties.service';
 export { roomsService } from './rooms.service';

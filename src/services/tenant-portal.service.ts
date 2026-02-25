@@ -1,0 +1,86 @@
+import tenantApi from '@/lib/tenant-api';
+import api from '@/lib/axios';
+import type { Bill } from '@/types';
+
+export interface TenantBill extends Bill {
+  roomName?: string;
+}
+
+export interface TenantPayment {
+  _id: string;
+  billId: string | { _id: string; month: number; year: number };
+  amount: number;
+  method: string;
+  transactionId?: string;
+  status?: string;
+  note?: string;
+  paidAt?: string;
+  createdAt: string;
+}
+
+export interface TenantProfile {
+  _id: string;
+  fullName: string;
+  email?: string;
+  phone?: string;
+  identityCard?: string;
+  address?: string;
+  dob?: string;
+  telegramChatId?: string;
+}
+
+export interface VerifyTokenResponse {
+  accessToken: string;
+  tenant: {
+    fullName: string;
+    email?: string;
+    phone?: string;
+  };
+}
+
+export const tenantAuthService = {
+  /**
+   * Verify magic-link token — returns tenant JWT.
+   * Uses the main api (no auth header needed).
+   */
+  verify: (token: string): Promise<VerifyTokenResponse> =>
+    api.post<{ data: VerifyTokenResponse }>('/tenant-auth/verify', { token }).then((r) => r.data.data),
+
+  /**
+   * Get tenant profile using tenant JWT.
+   */
+  getProfile: (): Promise<TenantProfile> =>
+    tenantApi.get<{ data: TenantProfile }>('/tenant-auth/profile').then((r) => r.data.data),
+
+  /**
+   * Refresh tenant JWT.
+   */
+  refresh: (): Promise<{ accessToken: string }> =>
+    tenantApi.post<{ data: { accessToken: string } }>('/tenant-auth/refresh').then((r) => r.data.data),
+};
+
+export const tenantPortalService = {
+  /**
+   * Get all bills for the authenticated tenant (via active contracts).
+   */
+  getBills: (): Promise<TenantBill[]> =>
+    tenantApi.get<{ data: TenantBill[] }>('/tenant-portal/bills').then((r) => r.data.data),
+
+  /**
+   * Get one bill detail.
+   */
+  getBill: (id: string): Promise<TenantBill> =>
+    tenantApi.get<{ data: TenantBill }>(`/tenant-portal/bills/${id}`).then((r) => r.data.data),
+
+  /**
+   * Get payment history for the tenant.
+   */
+  getPayments: (): Promise<TenantPayment[]> =>
+    tenantApi.get<{ data: TenantPayment[] }>('/tenant-portal/payments').then((r) => r.data.data),
+
+  /**
+   * Get the VietQR code URL for a bill (tenant endpoint).
+   */
+  getBillQr: (billId: string): Promise<{ qrDataUrl: string; amount: number }> =>
+    tenantApi.get<{ data: { qrDataUrl: string; amount: number } }>(`/bills/${billId}/qr/tenant`).then((r) => r.data.data),
+};

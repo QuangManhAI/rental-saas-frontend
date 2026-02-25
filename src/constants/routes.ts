@@ -6,6 +6,11 @@ export const ROUTES = {
   // Auth
   LOGIN: '/login',
   REGISTER: '/register',
+  VERIFY_EMAIL: '/verify-email',
+  FORGOT_PASSWORD: '/forgot-password',
+
+  // Onboarding
+  ONBOARDING: '/onboarding',
 
   // Dashboard
   DASHBOARD: '/dashboard',
@@ -36,6 +41,7 @@ export const ROUTES = {
   // Bills
   BILLS: '/bills',
   BILL_NEW: '/bills/new',
+  BILL_BULK: '/bills/bulk',
   BILL_DETAIL: (id: string) => `/bills/${id}` as const,
 
   // Payments
@@ -49,4 +55,7 @@ export const ROUTES = {
 
   // Profile
   PROFILE: '/profile',
+
+  // Subscription
+  SUBSCRIPTION: '/subscription',
 } as const;

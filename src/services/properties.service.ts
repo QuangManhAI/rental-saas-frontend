@@ -1,6 +1,7 @@
 import api from '@/lib/axios';
 import {
   ApiResponse,
+  PaginatedResult,
   Property,
   CreatePropertyRequest,
   UpdatePropertyRequest,
@@ -13,7 +14,7 @@ export const propertiesService = {
     api.post<ApiResponse<Property>>(BASE, data).then((r) => r.data.data),
 
   findAll: () =>
-    api.get<ApiResponse<Property[]>>(BASE).then((r) => r.data.data),
+    api.get<ApiResponse<PaginatedResult<Property>>>(BASE).then((r) => r.data.data.data),
 
   findOne: (id: string) =>
     api.get<ApiResponse<Property>>(`${BASE}/${id}`).then((r) => r.data.data),
