@@ -44,14 +44,18 @@ export default function TenantLayout({ children }: { children: React.ReactNode }
   const router = useRouter();
   const pathname = usePathname();
 
+  // Public pages that don't require authentication
+  const publicPaths = ['/tenant/login', '/tenant/activate', '/tenant/forgot-password'];
+  const isPublicPage = publicPaths.some((p) => pathname.startsWith(p));
+
   useEffect(() => {
-    if (!isAuthenticated && pathname !== '/tenant/login') {
+    if (!isAuthenticated && !isPublicPage) {
       router.replace('/tenant/login');
     }
-  }, [isAuthenticated, pathname, router]);
+  }, [isAuthenticated, pathname, router, isPublicPage]);
 
-  // Show login page without the layout shell
-  if (pathname === '/tenant/login') {
+  // Show public pages without the layout shell
+  if (isPublicPage) {
     return <>{children}</>;
   }
 

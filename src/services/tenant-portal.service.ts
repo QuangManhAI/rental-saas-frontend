@@ -38,23 +38,41 @@ export interface VerifyTokenResponse {
   };
 }
 
+export interface LoginResponse {
+  accessToken: string;
+  tenant: {
+    fullName: string;
+    email?: string;
+    phone?: string;
+  };
+}
+
 export const tenantAuthService = {
-  /**
-   * Verify magic-link token — returns tenant JWT.
-   * Uses the main api (no auth header needed).
-   */
+  /** @deprecated Verify magic-link token */
   verify: (token: string): Promise<VerifyTokenResponse> =>
     api.post<{ data: VerifyTokenResponse }>('/tenant-auth/verify', { token }).then((r) => r.data.data),
 
-  /**
-   * Get tenant profile using tenant JWT.
-   */
+  /** Activate account with token + password */
+  activate: (token: string, password: string): Promise<LoginResponse> =>
+    api.post<{ data: LoginResponse }>('/tenant-auth/activate', { token, password }).then((r) => r.data.data),
+
+  /** Login with email + password */
+  login: (email: string, password: string): Promise<LoginResponse> =>
+    api.post<{ data: LoginResponse }>('/tenant-auth/login', { email, password }).then((r) => r.data.data),
+
+  /** Request forgot-password OTP */
+  requestForgotPasswordOtp: (email: string): Promise<{ message: string }> =>
+    api.post<{ data: { message: string } }>('/tenant-auth/forgot-password/request-otp', { email }).then((r) => r.data.data),
+
+  /** Verify OTP and set new password */
+  verifyForgotPasswordOtp: (email: string, code: string, newPassword: string): Promise<{ message: string }> =>
+    api.post<{ data: { message: string } }>('/tenant-auth/forgot-password/verify-otp', { email, code, newPassword }).then((r) => r.data.data),
+
+  /** Get tenant profile using tenant JWT */
   getProfile: (): Promise<TenantProfile> =>
     tenantApi.get<{ data: TenantProfile }>('/tenant-auth/profile').then((r) => r.data.data),
 
-  /**
-   * Refresh tenant JWT.
-   */
+  /** Refresh tenant JWT */
   refresh: (): Promise<{ accessToken: string }> =>
     tenantApi.post<{ data: { accessToken: string } }>('/tenant-auth/refresh').then((r) => r.data.data),
 };
