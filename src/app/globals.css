@@ -137,3 +137,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* AI Chat streaming cursor blink animation */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@utility animate-blink {
+  animation: blink 0.8s step-end infinite;
+}

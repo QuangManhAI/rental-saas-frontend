@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
     aiAgentService,
     AiConversation,
@@ -22,14 +22,20 @@ export function useAiChat() {
     const [conversationId, setConversationId] = useState<string | null>(null);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+
+    // ─── Streaming state ────────────────────────────────────────
+    const [streamingText, setStreamingText] = useState('');
+    const [statusText, setStatusText] = useState('');
+    const abortRef = useRef<AbortController | null>(null);
+
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    // Auto-scroll on new messages
+    // Auto-scroll on new messages or streaming text changes
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
-    }, [messages]);
+    }, [messages, streamingText, statusText]);
 
     // Get conversation list
     const { data: conversations = [], refetch: refetchConversations } = useQuery({
@@ -77,14 +83,43 @@ export function useAiChat() {
     const startNewConversation = useCallback(async () => {
         setConversationId(null);
         setMessages([]);
+        setStreamingText('');
+        setStatusText('');
     }, []);
 
-    // Send message
+    // ─── Stop streaming ────────────────────────────────────────
+    const stopStreaming = useCallback(() => {
+        if (abortRef.current) {
+            abortRef.current.abort();
+            abortRef.current = null;
+        }
+
+        // If there's any streamed text, save it as a partial message
+        setStreamingText((current) => {
+            if (current.trim()) {
+                const partialMsg: ChatMessage = {
+                    id: `ai-partial-${Date.now()}`,
+                    role: 'assistant',
+                    content: current + ' ⏹',
+                    timestamp: new Date(),
+                };
+                setMessages((prev) => [...prev, partialMsg]);
+            }
+            return '';
+        });
+
+        setStatusText('');
+        setIsLoading(false);
+    }, []);
+
+    // ─── Send message (streaming) ──────────────────────────────
     const sendMessage = useCallback(
         async (text: string) => {
             if (!text.trim() || isLoading) return;
 
             setIsLoading(true);
+            setStreamingText('');
+            setStatusText('');
 
             // Add user message immediately
             const userMsg: ChatMessage = {
@@ -105,21 +140,70 @@ export function useAiChat() {
                     refetchConversations();
                 }
 
-                // Send message and wait for response
-                const response = await aiAgentService.sendMessage(convId, text.trim());
+                // Stream the response
+                const controller = aiAgentService.sendMessageStream(
+                    convId,
+                    text.trim(),
+                    {
+                        onStatus: (statusMsg) => {
+                            setStatusText(statusMsg);
+                        },
+                        onToken: (tokenText) => {
+                            setStatusText(''); // Clear status when tokens start
+                            setStreamingText((prev) => prev + tokenText);
+                        },
+                        onDone: (data) => {
+                            // Finalise: add the full message and clear streaming state
+                            const aiMsg: ChatMessage = {
+                                id: `ai-${Date.now()}`,
+                                role: 'assistant',
+                                content: data.reply,
+                                timestamp: new Date(),
+                                usage: data.usage,
+                            };
+                            setMessages((prev) => [...prev, aiMsg]);
+                            setStreamingText('');
+                            setStatusText('');
+                            setIsLoading(false);
+                            abortRef.current = null;
+                            refetchUsage();
+                        },
+                        onError: (errMsg) => {
+                            const errorAiMsg: ChatMessage = {
+                                id: `error-${Date.now()}`,
+                                role: 'assistant',
+                                content: `❌ ${errMsg}`,
+                                timestamp: new Date(),
+                            };
+                            setMessages((prev) => [...prev, errorAiMsg]);
+                            setStreamingText('');
+                            setStatusText('');
+                            setIsLoading(false);
+                            abortRef.current = null;
+                        },
+                        onComplete: () => {
+                            // Fallback: if done wasn't received but stream ended
+                            setStreamingText((current) => {
+                                if (current.trim() && abortRef.current) {
+                                    // Stream ended without done event — save what we have
+                                    const partialMsg: ChatMessage = {
+                                        id: `ai-${Date.now()}`,
+                                        role: 'assistant',
+                                        content: current,
+                                        timestamp: new Date(),
+                                    };
+                                    setMessages((prev) => [...prev, partialMsg]);
+                                }
+                                return '';
+                            });
+                            setStatusText('');
+                            setIsLoading(false);
+                            abortRef.current = null;
+                        },
+                    },
+                );
 
-                // Add AI response
-                const aiMsg: ChatMessage = {
-                    id: `ai-${Date.now()}`,
-                    role: 'assistant',
-                    content: response.reply,
-                    timestamp: new Date(),
-                    usage: response.usage,
-                };
-                setMessages((prev) => [...prev, aiMsg]);
-
-                // Refresh usage
-                refetchUsage();
+                abortRef.current = controller;
             } catch (error: unknown) {
                 const errMsg =
                     error instanceof Error ? error.message : 'Có lỗi xảy ra';
@@ -130,7 +214,6 @@ export function useAiChat() {
                     timestamp: new Date(),
                 };
                 setMessages((prev) => [...prev, errorAiMsg]);
-            } finally {
                 setIsLoading(false);
             }
         },
@@ -161,5 +244,9 @@ export function useAiChat() {
         switchConversation,
         startNewConversation,
         deleteConversation,
+        // ─── New streaming state ────────────────────────────────
+        streamingText,
+        statusText,
+        stopStreaming,
     };
 }

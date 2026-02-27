@@ -9,6 +9,7 @@ interface AiMessageProps {
     role: 'user' | 'assistant';
     content: string;
     timestamp: Date;
+    isStreaming?: boolean;
     usage?: {
         promptTokens: number;
         completionTokens: number;
@@ -17,7 +18,7 @@ interface AiMessageProps {
     };
 }
 
-export function AiMessage({ role, content, timestamp, usage }: AiMessageProps) {
+export function AiMessage({ role, content, timestamp, isStreaming, usage }: AiMessageProps) {
     const isUser = role === 'user';
 
     return (
@@ -45,6 +46,9 @@ export function AiMessage({ role, content, timestamp, usage }: AiMessageProps) {
                     )}
                 >
                     {content}
+                    {isStreaming && (
+                        <span className="inline-block w-[2px] h-[1em] bg-violet-500 ml-0.5 align-text-bottom animate-blink" />
+                    )}
                 </div>
                 <div
                     className={cn(
@@ -52,7 +56,9 @@ export function AiMessage({ role, content, timestamp, usage }: AiMessageProps) {
                         isUser && 'justify-end',
                     )}
                 >
-                    <span>{format(timestamp, 'HH:mm', { locale: vi })}</span>
+                    {!isStreaming && (
+                        <span>{format(timestamp, 'HH:mm', { locale: vi })}</span>
+                    )}
                     {usage && (
                         <span className="opacity-60">
                             · {(usage.responseTimeMs / 1000).toFixed(1)}s

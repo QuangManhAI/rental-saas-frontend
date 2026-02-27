@@ -7,8 +7,9 @@ import {
     Plus,
     MessageCircle,
     Trash2,
-    Loader2,
+    Square,
     Sparkles,
+    Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -33,6 +34,9 @@ export function AiChatPanel({
         switchConversation,
         startNewConversation,
         deleteConversation,
+        streamingText,
+        statusText,
+        stopStreaming,
     } = useAiChat();
 
     const [input, setInput] = useState('');
@@ -142,7 +146,7 @@ export function AiChatPanel({
                         ref={scrollRef}
                         className="flex-1 overflow-y-auto px-4 py-4 space-y-1"
                     >
-                        {messages.length === 0 && (
+                        {messages.length === 0 && !isLoading && (
                             <div className="flex flex-col items-center justify-center h-full text-center space-y-3">
                                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
                                     <Sparkles className="w-7 h-7 text-white" />
@@ -180,17 +184,42 @@ export function AiChatPanel({
                                 usage={msg.usage}
                             />
                         ))}
+
+                        {/* ── Streaming progress / typing indicator ─── */}
                         {isLoading && (
                             <div className="flex gap-3 mb-4">
                                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0">
                                     <Sparkles className="w-4 h-4 text-white" />
                                 </div>
-                                <div className="px-4 py-3 rounded-2xl rounded-bl-md bg-muted">
-                                    <div className="flex gap-1">
-                                        <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:0ms]" />
-                                        <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:150ms]" />
-                                        <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:300ms]" />
-                                    </div>
+                                <div className="max-w-[80%] space-y-1">
+                                    {/* Status text (progress indicator) */}
+                                    {statusText && !streamingText && (
+                                        <div className="px-4 py-2.5 rounded-2xl rounded-bl-md bg-muted">
+                                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                <Loader2 className="w-3.5 h-3.5 animate-spin text-violet-500" />
+                                                <span className="animate-pulse">{statusText}</span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Streaming text (typewriter) */}
+                                    {streamingText && (
+                                        <div className="px-4 py-2.5 rounded-2xl rounded-bl-md bg-muted text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+                                            {streamingText}
+                                            <span className="inline-block w-[2px] h-[1em] bg-violet-500 ml-0.5 align-text-bottom animate-blink" />
+                                        </div>
+                                    )}
+
+                                    {/* Bouncing dots (initial loading, before any status arrives) */}
+                                    {!statusText && !streamingText && (
+                                        <div className="px-4 py-3 rounded-2xl rounded-bl-md bg-muted">
+                                            <div className="flex gap-1">
+                                                <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:0ms]" />
+                                                <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:150ms]" />
+                                                <span className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:300ms]" />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -232,18 +261,27 @@ export function AiChatPanel({
                                 className="flex-1 resize-none rounded-xl border bg-muted/50 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 max-h-24"
                                 disabled={isLoading}
                             />
-                            <Button
-                                size="icon"
-                                className="h-10 w-10 rounded-xl bg-violet-600 hover:bg-violet-700 flex-shrink-0"
-                                onClick={handleSend}
-                                disabled={!input.trim() || isLoading}
-                            >
-                                {isLoading ? (
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
+                            {isLoading ? (
+                                /* ── Stop button ─── */
+                                <Button
+                                    size="icon"
+                                    className="h-10 w-10 rounded-xl bg-red-500 hover:bg-red-600 flex-shrink-0 transition-colors"
+                                    onClick={stopStreaming}
+                                    title="Dừng phản hồi"
+                                >
+                                    <Square className="w-4 h-4 fill-white" />
+                                </Button>
+                            ) : (
+                                /* ── Send button ─── */
+                                <Button
+                                    size="icon"
+                                    className="h-10 w-10 rounded-xl bg-violet-600 hover:bg-violet-700 flex-shrink-0"
+                                    onClick={handleSend}
+                                    disabled={!input.trim()}
+                                >
                                     <Send className="w-4 h-4" />
-                                )}
-                            </Button>
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </div>

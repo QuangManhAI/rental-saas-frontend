@@ -79,4 +79,109 @@ export const aiAgentService = {
 
     getUsage: () =>
         api.get<ApiResponse<AiUsage>>(`${BASE}/usage`).then((r) => r.data.data),
+
+    /**
+     * SSE streaming message — uses fetch() (not axios) for streaming support.
+     * Returns AbortController so the caller can cancel/stop the stream.
+     */
+    sendMessageStream: (
+        conversationId: string,
+        message: string,
+        callbacks: StreamCallbacks,
+    ): AbortController => {
+        const controller = new AbortController();
+
+        // Get auth token from localStorage (same pattern as axios interceptor)
+        let token = '';
+        try {
+            const stored = localStorage.getItem('auth-storage');
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                token = parsed?.state?.accessToken || '';
+            }
+        } catch { /* noop */ }
+
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
+
+        fetch(`${apiUrl}${BASE}/conversations/${conversationId}/messages/stream`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({ message }),
+            signal: controller.signal,
+        })
+            .then(async (res) => {
+                if (!res.ok) {
+                    callbacks.onError?.(`Lỗi ${res.status}: ${res.statusText}`);
+                    return;
+                }
+
+                const reader = res.body?.getReader();
+                if (!reader) {
+                    callbacks.onError?.('Không thể đọc stream.');
+                    return;
+                }
+
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+
+                    // Parse SSE lines: "data: {...}\n\n"
+                    const lines = buffer.split('\n\n');
+                    buffer = lines.pop() || ''; // Keep incomplete chunk in buffer
+
+                    for (const line of lines) {
+                        const trimmed = line.trim();
+                        if (!trimmed || !trimmed.startsWith('data: ')) continue;
+
+                        try {
+                            const payload = JSON.parse(trimmed.slice(6));
+                            const event = payload.event as string;
+                            const data = payload.data;
+
+                            if (event === 'status') {
+                                callbacks.onStatus?.(data.text);
+                            } else if (event === 'token') {
+                                callbacks.onToken?.(data.text);
+                            } else if (event === 'done') {
+                                callbacks.onDone?.(data);
+                            } else if (event === 'error') {
+                                callbacks.onError?.(data.message);
+                            }
+                        } catch {
+                            // Skip malformed SSE lines
+                        }
+                    }
+                }
+
+                // If stream ends without a done event, signal completion
+                callbacks.onComplete?.();
+            })
+            .catch((err) => {
+                if (err.name === 'AbortError') {
+                    // User cancelled — this is expected
+                    callbacks.onComplete?.();
+                    return;
+                }
+                callbacks.onError?.(err.message || 'Lỗi kết nối.');
+            });
+
+        return controller;
+    },
 };
+
+/** Callbacks for streaming events */
+export interface StreamCallbacks {
+    onStatus?: (text: string) => void;
+    onToken?: (text: string) => void;
+    onDone?: (data: { reply: string; usage: AiSendResponse['usage'] }) => void;
+    onError?: (message: string) => void;
+    onComplete?: () => void;
+}
