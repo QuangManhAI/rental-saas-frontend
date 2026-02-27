@@ -101,4 +101,22 @@ export const tenantPortalService = {
    */
   getBillQr: (billId: string): Promise<{ qrDataUrl: string; amount: number }> =>
     tenantApi.get<{ data: { qrDataUrl: string; amount: number } }>(`/bills/${billId}/qr/tenant`).then((r) => r.data.data),
+
+  /**
+   * Create MoMo payment for a bill.
+   */
+  createMomoPayment: (billId: string): Promise<{ payUrl: string; orderId: string; qrCodeUrl?: string }> =>
+    tenantApi.post<{ data: { payUrl: string; orderId: string; qrCodeUrl?: string } }>('/tenant-portal/pay/momo', { billId }).then((r) => r.data.data),
+
+  /**
+   * Create VNPay payment for a bill.
+   */
+  createVnpayPayment: (billId: string): Promise<{ paymentUrl: string; txnRef: string }> =>
+    tenantApi.post<{ data: { paymentUrl: string; txnRef: string } }>('/tenant-portal/pay/vnpay', { billId }).then((r) => r.data.data),
+
+  /**
+   * Get available payment methods for this tenant's owner.
+   */
+  getPaymentMethods: (): Promise<{ id: string; name: string; available: boolean }[]> =>
+    tenantApi.get<{ data: { id: string; name: string; available: boolean }[] }>('/tenant-portal/payment-methods').then((r) => r.data.data),
 };
