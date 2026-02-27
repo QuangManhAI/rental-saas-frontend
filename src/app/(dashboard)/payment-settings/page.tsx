@@ -72,11 +72,8 @@ export default function PaymentSettingsPage() {
             momoSecretKey: provider === 'MOMO' ? momoSecretKey : undefined,
             vnpayTmnCode: undefined,
             vnpayHashSecret: undefined,
-            // Preserve current active state if it exists, default to false. 
-            // NOTE: Requirement says "Do NOT reset state on reload". 
-            // When saving new credentials, we might want to keep it inactive until user explicitly enables it, 
-            // OR keep existing state. Safe bet is keep existing state.
-            isActive: settings?.isActive ?? false,
+            // Auto-activate when saving credentials so tenants can pay immediately
+            isActive: true,
         }, {
             onSuccess: () => {
                 setMode('LINKED');
