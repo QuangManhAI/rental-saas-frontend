@@ -8,6 +8,7 @@ import {
   CreditCard,
   UserCog,
   Settings,
+  Sparkles,
   type LucideIcon,
 } from 'lucide-react';
 import { ROUTES } from './routes';
@@ -56,6 +57,11 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Giao dịch',
     href: ROUTES.PAYMENTS,
     icon: CreditCard,
+  },
+  {
+    label: 'Trợ lý AI',
+    href: ROUTES.AI_AGENT,
+    icon: Sparkles,
   },
   {
     label: 'Cài đặt TT',

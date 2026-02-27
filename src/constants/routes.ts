@@ -53,6 +53,9 @@ export const ROUTES = {
   USER_NEW: '/users/new',
   USER_EDIT: (id: string) => `/users/${id}/edit` as const,
 
+  // AI Agent
+  AI_AGENT: '/ai-agent',
+
   // Profile
   PROFILE: '/profile',
 
