@@ -7,10 +7,6 @@ import {
   Square,
   Moon,
   Sun,
-  UserPlus,
-  FileText,
-  CreditCard,
-  BarChart3,
   MessageCircle,
   Clock,
   ChevronDown,
@@ -39,19 +35,14 @@ function getGreeting() {
   return 'tối';
 }
 
-// ─── Quick Actions ───────────────────────────────────────
-const QUICK_ACTIONS = [
-  { icon: UserPlus, label: 'Thêm khách mới', prompt: 'Tôi muốn thêm khách thuê mới' },
-  { icon: FileText, label: 'Tạo hoá đơn', prompt: 'Tạo hoá đơn tháng này' },
-  { icon: CreditCard, label: 'Ghi nhận thanh toán', prompt: 'Ghi nhận thanh toán cho khách' },
-  { icon: BarChart3, label: 'Xem báo cáo', prompt: 'Báo cáo doanh thu tháng này' },
-];
-
-// ─── Suggested prompts ──────────────────────────────────
+// ─── Suggested prompts (includes quick actions) ─────────
 const SUGGESTIONS = [
+  '➕ Thêm khách thuê mới',
+  '📄 Tạo hoá đơn tháng này',
+  '💳 Ghi nhận thanh toán',
+  '📊 Báo cáo doanh thu tháng này',
   'Phòng nào đang trống?',
   'Ai chưa thanh toán tháng này?',
-  'Tổng doanh thu tháng này bao nhiêu?',
   'Hợp đồng nào sắp hết hạn?',
 ];
 
@@ -116,11 +107,6 @@ export default function AiAgentPage() {
     }
   };
 
-  const handleQuickAction = (prompt: string) => {
-    setInput(prompt);
-    inputRef.current?.focus();
-  };
-
   const greeting = getGreeting();
   const firstName = user?.fullName?.split(' ').pop() || 'bạn';
 
@@ -171,24 +157,6 @@ export default function AiAgentPage() {
                 )}
               </button>
             </div>
-          </div>
-
-          {/* ══════════════ QUICK ACTIONS ══════════════ */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {QUICK_ACTIONS.map((action) => (
-              <button
-                key={action.label}
-                onClick={() => handleQuickAction(action.prompt)}
-                className="group flex flex-col items-center gap-2 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 hover:border-violet-300 dark:hover:border-violet-600 hover:shadow-md hover:shadow-violet-500/5 transition-all duration-200"
-              >
-                <div className="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-900/30 flex items-center justify-center group-hover:bg-violet-100 dark:group-hover:bg-violet-900/50 group-hover:scale-110 transition-all duration-200">
-                  <action.icon className="w-5 h-5 text-violet-600 dark:text-violet-400" />
-                </div>
-                <span className="text-xs font-medium text-slate-600 dark:text-slate-300 text-center">
-                  {action.label}
-                </span>
-              </button>
-            ))}
           </div>
 
           {/* ══════════════ CHAT AREA ══════════════ */}
