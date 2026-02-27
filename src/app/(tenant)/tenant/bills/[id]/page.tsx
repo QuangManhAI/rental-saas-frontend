@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, Download, QrCode, CreditCard, Wallet, Building2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Download, Wallet } from 'lucide-react';
 import { tenantPortalService } from '@/services/tenant-portal.service';
 import { BillStatus } from '@/types';
 import { cn } from '@/lib/utils';
@@ -34,7 +34,6 @@ function formatCurrency(n: number) {
 export default function TenantBillDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [paymentLoading, setPaymentLoading] = useState<string | null>(null);
-  const [showQr, setShowQr] = useState(false);
 
   const { data: bill, isLoading } = useQuery({
     queryKey: ['tenant-bill', id],
@@ -43,12 +42,6 @@ export default function TenantBillDetailPage() {
   });
 
   const isPaid = bill?.status === BillStatus.PAID;
-
-  const { data: qrData } = useQuery({
-    queryKey: ['tenant-bill-qr', id],
-    queryFn: () => tenantPortalService.getBillQr(id),
-    enabled: !!id && !!bill && !isPaid,
-  });
 
   const { data: paymentMethods } = useQuery({
     queryKey: ['tenant-payment-methods'],
@@ -63,18 +56,6 @@ export default function TenantBillDetailPage() {
       window.location.href = result.payUrl;
     } catch (err: any) {
       alert(err?.response?.data?.message || 'Không thể tạo thanh toán MoMo');
-    } finally {
-      setPaymentLoading(null);
-    }
-  };
-
-  const handleVnpayPay = async () => {
-    setPaymentLoading('vnpay');
-    try {
-      const result = await tenantPortalService.createVnpayPayment(id);
-      window.location.href = result.paymentUrl;
-    } catch (err: any) {
-      alert(err?.response?.data?.message || 'Không thể tạo thanh toán VNPay');
     } finally {
       setPaymentLoading(null);
     }
@@ -103,7 +84,6 @@ export default function TenantBillDetailPage() {
   const remaining = bill.totalAmount - bill.paidAmount;
 
   const momoAvailable = paymentMethods?.find((m) => m.id === 'momo')?.available;
-  const vnpayAvailable = paymentMethods?.find((m) => m.id === 'vnpay')?.available;
 
   return (
     <div className="space-y-4">
@@ -159,67 +139,24 @@ export default function TenantBillDetailPage() {
             Số tiền cần thanh toán: <span className="font-bold text-indigo-700 text-base">{formatCurrency(remaining)}</span>
           </p>
 
-          <div className="space-y-2">
-            {/* VietQR */}
+          {/* MoMo */}
+          {momoAvailable && (
             <button
-              onClick={() => setShowQr(!showQr)}
-              className="flex items-center gap-3 w-full rounded-xl border border-blue-200 bg-blue-50 text-blue-700 font-medium text-sm py-3 px-4 active:bg-blue-100 hover:bg-blue-100 transition-colors"
+              onClick={handleMomoPay}
+              disabled={!!paymentLoading}
+              className="flex items-center gap-3 w-full rounded-xl border border-pink-200 bg-pink-50 text-pink-700 font-medium text-sm py-3 px-4 active:bg-pink-100 hover:bg-pink-100 transition-colors disabled:opacity-50"
             >
-              <Building2 className="h-5 w-5" />
-              <span className="flex-1 text-left">Chuyển khoản ngân hàng (VietQR)</span>
-              <QrCode className="h-4 w-4" />
+              {paymentLoading === 'momo' ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Wallet className="h-5 w-5" />
+              )}
+              <span className="flex-1 text-left">Thanh toán qua MoMo</span>
             </button>
-
-            {/* MoMo */}
-            {momoAvailable && (
-              <button
-                onClick={handleMomoPay}
-                disabled={!!paymentLoading}
-                className="flex items-center gap-3 w-full rounded-xl border border-pink-200 bg-pink-50 text-pink-700 font-medium text-sm py-3 px-4 active:bg-pink-100 hover:bg-pink-100 transition-colors disabled:opacity-50"
-              >
-                {paymentLoading === 'momo' ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <Wallet className="h-5 w-5" />
-                )}
-                <span className="flex-1 text-left">Thanh toán qua MoMo</span>
-              </button>
-            )}
-
-            {/* VNPay */}
-            {vnpayAvailable && (
-              <button
-                onClick={handleVnpayPay}
-                disabled={!!paymentLoading}
-                className="flex items-center gap-3 w-full rounded-xl border border-sky-200 bg-sky-50 text-sky-700 font-medium text-sm py-3 px-4 active:bg-sky-100 hover:bg-sky-100 transition-colors disabled:opacity-50"
-              >
-                {paymentLoading === 'vnpay' ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <CreditCard className="h-5 w-5" />
-                )}
-                <span className="flex-1 text-left">Thanh toán qua VNPay</span>
-              </button>
-            )}
-          </div>
-
-          {/* VietQR code (expandable) */}
-          {showQr && qrData && (
-            <div className="rounded-lg bg-slate-50 border border-slate-200 p-4 text-center space-y-3 mt-2">
-              <img
-                src={qrData.qrDataUrl}
-                alt="VietQR payment QR code"
-                className="w-52 h-52 mx-auto rounded-lg border border-slate-100"
-              />
-              <p className="text-sm font-bold text-indigo-700">{formatCurrency(qrData.amount)}</p>
-              <p className="text-xs text-slate-400">Quét mã bằng app ngân hàng để chuyển khoản</p>
-            </div>
           )}
 
-          {showQr && !qrData && (
-            <div className="rounded-lg bg-slate-50 border border-slate-200 p-4 text-center">
-              <p className="text-sm text-slate-400">Chủ trọ chưa cấu hình tài khoản ngân hàng</p>
-            </div>
+          {!momoAvailable && paymentMethods && (
+            <p className="text-sm text-slate-400 text-center">Chủ trọ chưa cấu hình thanh toán MoMo</p>
           )}
         </div>
       )}

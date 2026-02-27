@@ -86,14 +86,10 @@ export default function PaymentSettingsPage() {
     };
 
     const handleToggleActive = (checked: boolean) => {
-        // Requirement: "Toggle must reflect isActive value from backend"
-        // We use optimistic update in the hook, so settings.isActive will update immediately
-        // We do NOT use local state for this.
+        // Only send isActive + provider — do NOT re-send masked credential strings
         upsert({
             provider: settings?.provider || 'MOMO',
             momoPartnerCode: settings?.momoPartnerCode,
-            momoAccessKey: settings?.momoAccessKey,
-            momoSecretKey: settings?.momoSecretKey,
             isActive: checked,
         });
     };
