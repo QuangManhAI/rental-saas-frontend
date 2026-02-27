@@ -5,6 +5,7 @@ import { AuthGuard } from '@/components/shared/auth-guard';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Topbar } from '@/components/layout/topbar';
 import { MobileNav, BottomNav } from '@/components/layout/mobile-nav';
+import { AiChatButton } from '@/components/ai-agent/ai-chat-button';
 import { useSidebarStore } from '@/stores/sidebar.store';
 import { cn } from '@/lib/utils';
 
@@ -22,6 +23,7 @@ export default function DashboardLayout({
         <Sidebar />
         <MobileNav open={mobileOpen} onClose={() => setMobileOpen(false)} />
         <BottomNav />
+        <AiChatButton />
 
         <div
           className={cn(
