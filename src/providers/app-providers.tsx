@@ -16,7 +16,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
       {children}
       <UpgradeDialog />
       <Toaster richColors position="bottom-right" />
-      <ReactQueryDevtools initialIsOpen={false} />
+      {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   );
 }

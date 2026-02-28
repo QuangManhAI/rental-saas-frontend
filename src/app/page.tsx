@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useRef } from 'react';
+import Image from 'next/image';
+import { useState, useRef, useEffect } from 'react';
 import {
   Building2, ChevronDown, Check, Star,
   FileText, CreditCard, Bell, BarChart3, Shield, Zap,
@@ -351,7 +352,7 @@ function GradientOrb({
   };
   return (
     <div
-      className={`absolute rounded-full blur-3xl pointer-events-none ${colorMap[color] || colorMap.indigo} ${className}`}
+      className={`absolute rounded-full blur-3xl pointer-events-none hidden md:block ${colorMap[color] || colorMap.indigo} ${className}`}
     />
   );
 }
@@ -360,13 +361,22 @@ function GradientOrb({
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ['start start', 'end start'],
   });
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 150]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, isMobile ? 0 : 150]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, isMobile ? 1 : 0]);
+
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 768px)');
+    setIsMobile(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
 
   return (
     <div className="min-h-screen bg-white text-gray-900 antialiased overflow-x-hidden relative">
@@ -492,11 +502,7 @@ export default function LandingPage() {
                 </Badge>
               </motion.div>
 
-              <motion.h1
-                variants={fadeUp}
-                initial="hidden"
-                animate="visible"
-                custom={1}
+              <h1
                 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold tracking-tight text-gray-900 leading-[1.1]"
               >
                 Quản lý nhà trọ{' '}
@@ -505,7 +511,7 @@ export default function LandingPage() {
                 </span>
                 <br />
                 <span className="text-gray-800">— không còn sổ tay</span>
-              </motion.h1>
+              </h1>
 
               <motion.p
                 variants={fadeUp}
@@ -584,14 +590,17 @@ export default function LandingPage() {
               transition={{ duration: 0.8, delay: 0.3, ease: EASE_OUT }}
               className="mt-14 lg:mt-0 relative"
             >
-              {/* Glow effect */}
-              <div className="absolute -inset-4 bg-gradient-to-tr from-indigo-500/20 via-violet-500/20 to-purple-500/20 rounded-3xl -z-10 blur-3xl" />
-              <div className="absolute -inset-1 bg-gradient-to-br from-indigo-500/20 via-transparent to-violet-500/20 rounded-2xl -z-10" />
+              {/* Glow effect — hidden on mobile for performance */}
+              <div className="hidden md:block absolute -inset-4 bg-gradient-to-tr from-indigo-500/20 via-violet-500/20 to-purple-500/20 rounded-3xl -z-10 blur-3xl" />
+              <div className="hidden md:block absolute -inset-1 bg-gradient-to-br from-indigo-500/20 via-transparent to-violet-500/20 rounded-2xl -z-10" />
 
               <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-indigo-900/20 ring-1 ring-white/20">
-                <img
+                <Image
                   src="/hd.jpg"
                   alt="Luxury rental property"
+                  width={800}
+                  height={520}
+                  priority
                   className="w-full h-[520px] object-cover"
                 />
                 {/* Gradient overlay at bottom */}
@@ -690,8 +699,7 @@ export default function LandingPage() {
                   key={item.title}
                   variants={scaleIn}
                   custom={i}
-                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                  className="relative group"
+                  className="relative group hover:-translate-y-1 transition-transform duration-200"
                 >
                   <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200/60 hover:shadow-xl hover:border-gray-300 transition-all duration-300">
                     {/* Gradient glow on hover */}
@@ -741,8 +749,7 @@ export default function LandingPage() {
                   key={f.title}
                   variants={scaleIn}
                   custom={i}
-                  whileHover={{ y: -6, transition: { duration: 0.2 } }}
-                  className="group"
+                  className="group hover:-translate-y-1.5 transition-transform duration-200"
                 >
                   <div className="h-full rounded-2xl border border-gray-200/60 bg-white p-6 hover:shadow-xl hover:border-gray-300 transition-all duration-300 relative overflow-hidden">
                     {/* Stripe-style gradient corner accent */}
@@ -891,8 +898,8 @@ export default function LandingPage() {
 
       {/* ── Marketing Cards (Stripe dark section) ── */}
       <section className="py-20 sm:py-28 bg-gray-950 relative overflow-hidden">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-violet-500/10 rounded-full blur-[120px]" />
+        <div className="hidden md:block absolute top-0 left-1/4 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[120px]" />
+        <div className="hidden md:block absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-violet-500/10 rounded-full blur-[120px]" />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
           <AnimatedSection>
@@ -951,8 +958,7 @@ export default function LandingPage() {
                   key={card.title}
                   variants={scaleIn}
                   custom={i}
-                  whileHover={{ y: -6, transition: { duration: 0.2 } }}
-                  className="group"
+                  className="group hover:-translate-y-1.5 transition-transform duration-200"
                 >
                   <div className="h-full rounded-2xl border border-gray-800 bg-gray-900/50 backdrop-blur-sm p-6 hover:border-gray-700 hover:bg-gray-900/80 transition-all duration-300 relative overflow-hidden">
                     <div className={`absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl ${card.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500 rounded-bl-[100px]`} />
@@ -1033,8 +1039,7 @@ export default function LandingPage() {
                   key={plan.name}
                   variants={scaleIn}
                   custom={i}
-                  whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                  className="relative"
+                  className="relative hover:-translate-y-2 transition-transform duration-200"
                 >
                   <div
                     className={`rounded-2xl p-6 border transition-all duration-300 ${
@@ -1106,8 +1111,7 @@ export default function LandingPage() {
                   key={t.name}
                   variants={scaleIn}
                   custom={i}
-                  whileHover={{ y: -4 }}
-                  className="group"
+                  className="group hover:-translate-y-1 transition-transform duration-200"
                 >
                   <div className="bg-white rounded-2xl p-6 border border-gray-200/60 hover:border-gray-300 hover:shadow-xl transition-all duration-300">
                     <StarRating count={t.rating} />
@@ -1160,8 +1164,8 @@ export default function LandingPage() {
         >
           <div className="absolute inset-0 bg-gray-950" />
           <div className="absolute inset-0">
-            <div className="absolute top-0 left-1/3 w-[600px] h-[600px] bg-indigo-500/15 rounded-full blur-[120px]" />
-            <div className="absolute bottom-0 right-1/3 w-[400px] h-[400px] bg-violet-500/15 rounded-full blur-[120px]" />
+            <div className="hidden md:block absolute top-0 left-1/3 w-[600px] h-[600px] bg-indigo-500/15 rounded-full blur-[120px]" />
+            <div className="hidden md:block absolute bottom-0 right-1/3 w-[400px] h-[400px] bg-violet-500/15 rounded-full blur-[120px]" />
           </div>
 
           <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center relative">
