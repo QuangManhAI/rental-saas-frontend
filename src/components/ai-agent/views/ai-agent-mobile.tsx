@@ -68,9 +68,9 @@ export function AiAgentMobile({
     };
 
     return (
-        <div className={cn(darkMode && 'dark', 'lg:hidden')}>
-            {/* 100dvh = viewport height. Subtract Topbar(64px). No layout bottom padding needed for AI Agent. */}
-            <div className="flex flex-col h-[calc(100dvh-64px)] bg-white dark:bg-slate-900 border-x-0 sm:border-x border-t border-b-0 border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div className={cn(darkMode && 'dark', 'lg:hidden', 'h-full flex flex-col')}>
+            {/* Flex-1 organic stretching, bounded by LayoutMobile. */}
+            <div className="flex-1 flex flex-col bg-white dark:bg-slate-900 border-x-0 sm:border-x border-t border-b-0 border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
 
                 {/* ═══ Header ═══ */}
                 <div className="flex items-center justify-between px-2 h-11 border-b border-slate-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm flex-shrink-0">

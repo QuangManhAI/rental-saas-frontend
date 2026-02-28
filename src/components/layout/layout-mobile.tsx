@@ -50,7 +50,10 @@ export function LayoutMobile({ children }: { children: React.ReactNode }) {
         .toUpperCase();
 
     return (
-        <div className="flex flex-col min-h-screen bg-slate-50">
+        <div className={cn(
+            'flex flex-col bg-slate-50',
+            isAiAgent ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'
+        )}>
             {/* Mobile Topbar - Solid white, no blur */}
             <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white px-4">
                 <div className="flex items-center gap-3">
