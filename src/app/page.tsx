@@ -401,7 +401,7 @@ export default function LandingPage() {
         initial={isMobile ? false : { y: -20, opacity: 0 }}
         animate={isMobile ? undefined : { y: 0, opacity: 1 }}
         transition={isMobile ? undefined : { duration: 0.5 }}
-        className={`sticky top-0 z-50 border-b border-gray-200/40 ${isMobile ? 'bg-white' : 'backdrop-blur-2xl bg-white/70'}`}
+        className={`sticky top-0 z-50 border-b ${isMobile ? 'bg-white border-gray-200 shadow-sm' : 'backdrop-blur-2xl bg-white/70 border-gray-200/40'}`}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
@@ -502,158 +502,163 @@ export default function LandingPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            style={{ y: heroY, opacity: heroOpacity }}
-            className="lg:grid lg:grid-cols-2 lg:gap-16 items-center min-h-[calc(100vh-4rem)] py-16 sm:py-20"
-          >
-            {/* Left — Text */}
-            <div className="flex flex-col justify-center">
-              <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0}>
-                <Badge className="mb-6 w-fit bg-indigo-50 text-indigo-700 border-indigo-200/60 hover:bg-indigo-100 backdrop-blur-sm rounded-xl px-4 py-1.5">
-                  <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-                  Dành riêng cho chủ nhà trọ Việt Nam
-                </Badge>
-              </motion.div>
+          {isMobile ? (
+            /* ══════════ MOBILE HERO — pure CSS, zero framer-motion ══════════ */
+            <div className="py-12">
+              <div className="flex flex-col justify-center">
+                <div className="mobile-reveal mobile-reveal-d1">
+                  <Badge className="mb-6 w-fit bg-indigo-50 text-indigo-700 border-indigo-200/60 rounded-xl px-4 py-1.5">
+                    <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+                    Dành riêng cho chủ nhà trọ Việt Nam
+                  </Badge>
+                </div>
 
-              <h1
-                className="text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold tracking-tight text-gray-900 leading-[1.1]"
-              >
-                Quản lý nhà trọ{' '}
-                <span className="stripe-gradient-text">
-                  thông minh
-                </span>
-                <br />
-                <span className="text-gray-800">— không còn sổ tay</span>
-              </h1>
+                <h1 className="mobile-reveal mobile-reveal-d2 text-4xl font-extrabold tracking-tight text-gray-900 leading-[1.1]">
+                  Quản lý nhà trọ{' '}
+                  <span className="stripe-gradient-text">thông minh</span>
+                  <br />
+                  <span className="text-gray-800">— không còn sổ tay</span>
+                </h1>
 
-              <motion.p
-                variants={fadeUp}
-                initial="hidden"
-                animate="visible"
-                custom={2}
-                className="mt-6 text-lg sm:text-xl text-gray-500 max-w-lg leading-relaxed"
-              >
-                Tự động hóa hóa đơn, thu tiền, nhắc nhở và báo cáo doanh thu.
-                Tiết kiệm hàng giờ mỗi tháng cho mỗi chủ nhà.
-              </motion.p>
+                <p className="mobile-reveal mobile-reveal-d3 mt-6 text-lg text-gray-500 leading-relaxed">
+                  Tự động hóa hóa đơn, thu tiền, nhắc nhở và báo cáo doanh thu.
+                  Tiết kiệm hàng giờ mỗi tháng cho mỗi chủ nhà.
+                </p>
 
-              <motion.div
-                variants={fadeUp}
-                initial="hidden"
-                animate="visible"
-                custom={3}
-                className="mt-8 flex flex-col sm:flex-row gap-3"
-              >
-                <Link href="/register">
-                  <Button
-                    size="lg"
-                    className="h-13 px-8 text-base rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-300 hover:-translate-y-0.5"
-                  >
-                    Bắt đầu miễn phí
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </Link>
-                <Link href="/login">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="h-13 px-8 text-base rounded-xl border-gray-200 hover:border-indigo-300 hover:bg-indigo-50/50 backdrop-blur-sm transition-all duration-300"
-                  >
-                    Đăng nhập ngay
-                  </Button>
-                </Link>
-              </motion.div>
+                <div className="mobile-reveal mobile-reveal-d4 mt-8 flex flex-col gap-3">
+                  <Link href="/register">
+                    <Button size="lg" className="h-13 px-8 text-base rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 shadow-xl shadow-indigo-500/25">
+                      Bắt đầu miễn phí <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                  </Link>
+                  <Link href="/login">
+                    <Button size="lg" variant="outline" className="h-13 px-8 text-base rounded-xl border-gray-200">
+                      Đăng nhập ngay
+                    </Button>
+                  </Link>
+                </div>
 
-              <motion.p
-                variants={fadeUp}
-                initial="hidden"
-                animate="visible"
-                custom={4}
-                className="mt-4 text-sm text-gray-400"
-              >
-                Không cần thẻ tín dụng · Miễn phí mãi mãi với gói cơ bản
-              </motion.p>
+                <p className="mobile-reveal mobile-reveal-d5 mt-4 text-sm text-gray-400">
+                  Không cần thẻ tín dụng · Miễn phí mãi mãi với gói cơ bản
+                </p>
 
-              {/* Stats */}
-              <motion.div
-                variants={staggerContainer}
-                initial="hidden"
-                animate="visible"
-                className="mt-12 grid grid-cols-3 gap-6 max-w-sm"
-              >
-                {[
-                  { label: 'Chủ nhà tin dùng', value: '1,200+' },
-                  { label: 'Phòng quản lý', value: '18,000+' },
-                  { label: 'Hóa đơn/tháng', value: '50,000+' },
-                ].map((stat, i) => (
-                  <motion.div key={stat.label} variants={fadeUp} custom={i}>
-                    <div className="text-2xl font-bold stripe-gradient-text">
-                      {stat.value}
+                <div className="mobile-reveal mobile-reveal-d6 mt-10 grid grid-cols-3 gap-6">
+                  {[
+                    { label: 'Chủ nhà tin dùng', value: '1,200+' },
+                    { label: 'Phòng quản lý', value: '18,000+' },
+                    { label: 'Hóa đơn/tháng', value: '50,000+' },
+                  ].map((stat) => (
+                    <div key={stat.label}>
+                      <div className="text-2xl font-bold stripe-gradient-text">{stat.value}</div>
+                      <div className="text-xs text-gray-500 mt-0.5 leading-tight">{stat.label}</div>
                     </div>
-                    <div className="text-xs text-gray-500 mt-0.5 leading-tight">{stat.label}</div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </div>
+                  ))}
+                </div>
+              </div>
 
-            {/* Right — Photo */}
-            <motion.div
-              initial={{ opacity: 0, x: 60, scale: 0.95 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.3, ease: EASE_OUT }}
-              className="mt-14 lg:mt-0 relative"
-            >
-              {/* Glow effect — hidden on mobile for performance */}
-              <div className="hidden md:block absolute -inset-4 bg-gradient-to-tr from-indigo-500/20 via-violet-500/20 to-purple-500/20 rounded-3xl -z-10 blur-3xl" />
-              <div className="hidden md:block absolute -inset-1 bg-gradient-to-br from-indigo-500/20 via-transparent to-violet-500/20 rounded-2xl -z-10" />
-
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-indigo-900/20 ring-1 ring-white/20">
-                <Image
-                  src="/hd.jpg"
-                  alt="Luxury rental property"
-                  width={800}
-                  height={520}
-                  priority
-                  className="w-full h-[520px] object-cover"
-                />
-                {/* Gradient overlay at bottom */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-
-                {/* Floating glassmorphism badge */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8, duration: 0.6 }}
-                  className="absolute bottom-5 left-5 right-5"
-                >
-                  <div className="bg-white/80 backdrop-blur-xl rounded-xl px-4 py-3 flex items-center gap-3 shadow-lg border border-white/50">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/30">
-                      <Building2 className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900">Quản lý toàn bộ bất động sản</p>
-                      <p className="text-xs text-gray-500">Nhiều tòa nhà, nhiều phòng — một màn hình</p>
+              {/* Mobile hero image — simple, no blur/glow */}
+              <div className="mt-8 relative mobile-reveal mobile-reveal-d6">
+                <div className="relative rounded-2xl overflow-hidden shadow-lg ring-1 ring-gray-200/50">
+                  <Image src="/hd.jpg" alt="Luxury rental property" width={800} height={320} priority className="w-full h-[260px] object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <div className="bg-white/90 rounded-xl px-3 py-2.5 flex items-center gap-3 shadow-md">
+                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shrink-0">
+                        <Building2 className="w-4 h-4 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-[13px] font-semibold text-gray-900">Quản lý toàn bộ bất động sản</p>
+                        <p className="text-[11px] text-gray-500">Nhiều tòa nhà, nhiều phòng — một màn hình</p>
+                      </div>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* ══════════ DESKTOP HERO — framer-motion + parallax ══════════ */
+            <motion.div
+              style={{ y: heroY, opacity: heroOpacity }}
+              className="lg:grid lg:grid-cols-2 lg:gap-16 items-center min-h-[calc(100vh-4rem)] py-16 sm:py-20"
+            >
+              <div className="flex flex-col justify-center">
+                <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0}>
+                  <Badge className="mb-6 w-fit bg-indigo-50 text-indigo-700 border-indigo-200/60 hover:bg-indigo-100 backdrop-blur-sm rounded-xl px-4 py-1.5">
+                    <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+                    Dành riêng cho chủ nhà trọ Việt Nam
+                  </Badge>
                 </motion.div>
 
-                {/* Floating stat card */}
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 1, duration: 0.6 }}
-                  className="absolute top-5 right-5"
-                >
-                  {/* <div className="bg-white/80 backdrop-blur-xl rounded-xl px-3 py-2 shadow-lg border border-white/50">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                      <span className="text-xs font-medium text-gray-700">98.5% uptime</span>
-                    </div>
-                  </div> */}
+                <h1 className="text-5xl lg:text-[3.5rem] font-extrabold tracking-tight text-gray-900 leading-[1.1]">
+                  Quản lý nhà trọ{' '}
+                  <span className="stripe-gradient-text">thông minh</span>
+                  <br />
+                  <span className="text-gray-800">— không còn sổ tay</span>
+                </h1>
+
+                <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={2} className="mt-6 text-lg sm:text-xl text-gray-500 max-w-lg leading-relaxed">
+                  Tự động hóa hóa đơn, thu tiền, nhắc nhở và báo cáo doanh thu.
+                  Tiết kiệm hàng giờ mỗi tháng cho mỗi chủ nhà.
+                </motion.p>
+
+                <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={3} className="mt-8 flex flex-row gap-3">
+                  <Link href="/register">
+                    <Button size="lg" className="h-13 px-8 text-base rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-300 hover:-translate-y-0.5">
+                      Bắt đầu miễn phí <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                  </Link>
+                  <Link href="/login">
+                    <Button size="lg" variant="outline" className="h-13 px-8 text-base rounded-xl border-gray-200 hover:border-indigo-300 hover:bg-indigo-50/50 backdrop-blur-sm transition-all duration-300">
+                      Đăng nhập ngay
+                    </Button>
+                  </Link>
+                </motion.div>
+
+                <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={4} className="mt-4 text-sm text-gray-400">
+                  Không cần thẻ tín dụng · Miễn phí mãi mãi với gói cơ bản
+                </motion.p>
+
+                <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="mt-12 grid grid-cols-3 gap-6 max-w-sm">
+                  {[
+                    { label: 'Chủ nhà tin dùng', value: '1,200+' },
+                    { label: 'Phòng quản lý', value: '18,000+' },
+                    { label: 'Hóa đơn/tháng', value: '50,000+' },
+                  ].map((stat, i) => (
+                    <motion.div key={stat.label} variants={fadeUp} custom={i}>
+                      <div className="text-2xl font-bold stripe-gradient-text">{stat.value}</div>
+                      <div className="text-xs text-gray-500 mt-0.5 leading-tight">{stat.label}</div>
+                    </motion.div>
+                  ))}
                 </motion.div>
               </div>
+
+              {/* Desktop photo with glow + floating badges */}
+              <motion.div
+                initial={{ opacity: 0, x: 60, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.3, ease: EASE_OUT }}
+                className="mt-14 lg:mt-0 relative"
+              >
+                <div className="absolute -inset-4 bg-gradient-to-tr from-indigo-500/20 via-violet-500/20 to-purple-500/20 rounded-3xl -z-10 blur-3xl" />
+                <div className="absolute -inset-1 bg-gradient-to-br from-indigo-500/20 via-transparent to-violet-500/20 rounded-2xl -z-10" />
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-indigo-900/20 ring-1 ring-white/20">
+                  <Image src="/hd.jpg" alt="Luxury rental property" width={800} height={520} priority className="w-full h-[520px] object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.6 }} className="absolute bottom-5 left-5 right-5">
+                    <div className="bg-white/80 backdrop-blur-xl rounded-xl px-4 py-3 flex items-center gap-3 shadow-lg border border-white/50">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/30">
+                        <Building2 className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">Quản lý toàn bộ bất động sản</p>
+                        <p className="text-xs text-gray-500">Nhiều tòa nhà, nhiều phòng — một màn hình</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
+          )}
         </div>
 
         {/* Scroll indicator */}
