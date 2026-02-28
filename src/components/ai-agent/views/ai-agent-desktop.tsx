@@ -96,7 +96,7 @@ export function AiAgentDesktop({
     return (
         <div className={cn(darkMode && 'dark')}>
             {/* Desktop: fill remaining viewport */}
-            <div className="hidden md:flex h-[calc(100dvh-64px-48px)] rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm overflow-hidden transition-all duration-200">
+            <div className="hidden lg:flex h-[calc(100dvh-64px-48px)] rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm overflow-hidden transition-all duration-200">
                 {/* ══════════════ LEFT SIDEBAR — Conversations ══════════════ */}
                 <div
                     className={cn(

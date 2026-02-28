@@ -68,7 +68,7 @@ export function AiAgentMobile({
     };
 
     return (
-        <div className={cn(darkMode && 'dark', 'md:hidden')}>
+        <div className={cn(darkMode && 'dark', 'lg:hidden')}>
             <div className="flex flex-col h-[calc(100dvh-64px-32px)] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
 
                 {/* ═══ Header ═══ */}

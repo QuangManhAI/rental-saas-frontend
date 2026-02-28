@@ -387,7 +387,7 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
                         </button>
 
                         {/* Toggles container */}
-                        <div className="hidden md:flex items-center">
+                        <div className="hidden lg:flex items-center">
                             {/* Search toggle */}
                             <button
                                 type="button"
