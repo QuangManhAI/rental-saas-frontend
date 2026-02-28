@@ -63,10 +63,13 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
   );
 }
 
-/** Bottom navigation bar — only visible on mobile (<lg) */
+/** Bottom navigation bar — only visible on mobile (<lg), hidden on AI agent page */
 export function BottomNav() {
   const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
+
+  // Hide BottomNav on AI agent page — it uses full viewport
+  if (pathname === '/ai-agent') return null;
 
   const visibleItems = BOTTOM_NAV_ITEMS.filter(
     (item) => !item.roles || (user && item.roles.includes(user.role)),

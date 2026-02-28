@@ -78,7 +78,6 @@ export default function AiAgentPage() {
 
   const [darkMode, setDarkMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [keyboardOpen, setKeyboardOpen] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('ai-dark-mode');
@@ -94,19 +93,6 @@ export default function AiAgentPage() {
     if (window.innerWidth < 768) setSidebarOpen(false);
   }, []);
 
-  // Detect mobile keyboard open/close via visualViewport
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const threshold = 150; // keyboard is at least 150px
-    const onResize = () => {
-      const diff = window.innerHeight - vv.height;
-      setKeyboardOpen(diff > threshold);
-    };
-    vv.addEventListener('resize', onResize);
-    return () => vv.removeEventListener('resize', onResize);
-  }, []);
-
   const handleSend = async (text: string) => {
     if (!text.trim() || isLoading) return;
     await sendMessage(text);
@@ -117,15 +103,8 @@ export default function AiAgentPage() {
 
   return (
     <div className={cn(darkMode && 'dark')}>
-      {/* Fill remaining viewport — dvh adapts when mobile keyboard opens */}
-      <div className={cn(
-        'flex rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm overflow-hidden transition-all duration-200',
-        // When keyboard is open on mobile, remove BottomNav offset (it's hidden behind keyboard)
-        keyboardOpen
-          ? 'h-[calc(100dvh-64px-32px)]'
-          : 'h-[calc(100dvh-64px-32px-80px)]',
-        'lg:h-[calc(100dvh-64px-48px)]',
-      )}>
+      {/* Fill remaining viewport — BottomNav is hidden on this page, no 80px offset needed */}
+      <div className="flex h-[calc(100dvh-64px-32px)] lg:h-[calc(100dvh-64px-48px)] rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm overflow-hidden transition-all duration-200">
 
         {/* ══════════════ LEFT SIDEBAR — Conversations ══════════════ */}
         <div
