@@ -36,8 +36,8 @@ export function useAiChat() {
     const rafRef = useRef<number | null>(null);
     const lastFrameRef = useRef(0);
 
-    const CHARS_PER_FRAME = 2;  // characters to reveal per ~16ms frame
-    const MIN_FRAME_MS = 12;    // minimum ms between reveals
+    const CHARS_PER_FRAME = 1;  // characters to reveal per frame
+    const MIN_FRAME_MS = 25;    // minimum ms between reveals (~40 chars/sec)
 
     const tickTypewriter = useCallback(() => {
         const now = performance.now();
