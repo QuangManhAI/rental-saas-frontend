@@ -15,6 +15,8 @@ interface ChatMessage {
     content: string;
     timestamp: Date;
     usage?: AiSendResponse['usage'];
+    /** true if this message was already revealed via streaming typewriter */
+    streamed?: boolean;
 }
 
 export function useAiChat() {
@@ -49,6 +51,7 @@ export function useAiChat() {
             content: data.reply,
             timestamp: new Date(),
             usage: data.usage,
+            streamed: true,
         };
         setMessages((prev) => [...prev, aiMsg]);
         bufferRef.current = '';
@@ -206,6 +209,7 @@ export function useAiChat() {
                 role: 'assistant',
                 content: fullText + ' ⏹',
                 timestamp: new Date(),
+                streamed: true,
             };
             setMessages((prev) => [...prev, partialMsg]);
         }
@@ -284,6 +288,7 @@ export function useAiChat() {
                                     role: 'assistant',
                                     content: fullText,
                                     timestamp: new Date(),
+                                    streamed: true,
                                 };
                                 setMessages((prev) => [...prev, partialMsg]);
                             }

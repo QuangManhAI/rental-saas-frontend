@@ -1,10 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Sparkles,
-  Send,
-  Square,
   Moon,
   Sun,
   MessageCircle,
@@ -13,7 +11,6 @@ import {
   Plus,
   Bot,
   User,
-  Keyboard,
   PanelLeftClose,
   PanelLeftOpen,
   UserPlus,
@@ -31,6 +28,10 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAiChat } from '@/hooks/use-ai-chat';
 import { useAuthStore } from '@/stores/auth.store';
+import { GooeyText } from '@/components/ui/gooey-text-morphing';
+import { TypewriterText } from '@/components/ui/typewriter-text';
+import { PromptInputBox } from '@/components/ui/prompt-input-box';
+import { TypewriterReveal } from '@/components/ui/typewriter-reveal';
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -48,6 +49,13 @@ const SUGGESTIONS: { icon: LucideIcon; label: string }[] = [
   { icon: DoorOpen, label: 'Phòng nào đang trống?' },
   { icon: AlertCircle, label: 'Ai chưa thanh toán tháng này?' },
   { icon: CalendarClock, label: 'Hợp đồng nào sắp hết hạn?' },
+];
+
+const TYPEWRITER_GREETINGS = [
+  'Hỏi tôi về phòng, khách thuê, hợp đồng...',
+  'Tạo hoá đơn, ghi nhận thanh toán...',
+  'Xem báo cáo doanh thu, phân tích dữ liệu...',
+  'Quản lý nhà trọ thông minh hơn!',
 ];
 
 export default function AiAgentPage() {
@@ -68,10 +76,8 @@ export default function AiAgentPage() {
     stopStreaming,
   } = useAiChat();
 
-  const [input, setInput] = useState('');
   const [darkMode, setDarkMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('ai-dark-mode');
@@ -82,27 +88,14 @@ export default function AiAgentPage() {
     localStorage.setItem('ai-dark-mode', String(darkMode));
   }, [darkMode]);
 
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-
   // Hide sidebar on mobile by default
   useEffect(() => {
     if (window.innerWidth < 768) setSidebarOpen(false);
   }, []);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
-    const text = input;
-    setInput('');
+  const handleSend = async (text: string) => {
+    if (!text.trim() || isLoading) return;
     await sendMessage(text);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
   };
 
   const greeting = getGreeting();
@@ -110,7 +103,7 @@ export default function AiAgentPage() {
 
   return (
     <div className={cn(darkMode && 'dark')}>
-      {/* Fill remaining viewport: topbar=64px, main padding=16px*2 on mobile, 24px*2 on lg, bottom-nav=80px on mobile */}
+      {/* Fill remaining viewport */}
       <div className="h-[calc(100vh-64px-32px-80px)] lg:h-[calc(100vh-64px-48px)] flex rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm overflow-hidden transition-colors duration-300">
 
         {/* ══════════════ LEFT SIDEBAR — Conversations ══════════════ */}
@@ -187,7 +180,7 @@ export default function AiAgentPage() {
                 <Sparkles className="w-3.5 h-3.5 text-white" />
               </div>
               <div className="hidden sm:block leading-tight">
-                <h1 className="text-sm font-bold text-slate-800 dark:text-slate-100">Trợ lý AI</h1>
+                <h1 className="text-sm font-bold text-slate-800 dark:text-slate-100">RenTaff</h1>
                 <p className="text-[11px] text-slate-400 dark:text-slate-500">Chào buổi {greeting}, {firstName}!</p>
               </div>
             </div>
@@ -234,16 +227,32 @@ export default function AiAgentPage() {
           <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
             {messages.length === 0 && !isLoading && (
               <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
-                  <Sparkles className="w-7 h-7 text-white" />
+                {/* Agent avatar */}
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
+                  <Sparkles className="w-8 h-8 text-white" />
                 </div>
-                <div>
-                  <p className="font-semibold text-slate-800 dark:text-slate-100">Xin chào, {firstName}!</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-xs">
-                    Hỏi tôi về phòng, khách thuê, hợp đồng, hoá đơn hoặc doanh thu!
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2 justify-center max-w-lg">
+
+                {/* GooeyText agent name */}
+                <GooeyText
+                  texts={["Hello!", "I'm RenTaff", 'Your Agent AI']}
+                  morphTime={1.5}
+                  cooldownTime={1.5}
+                  className="h-12 w-full mt-5"
+                  textClassName="text-2xl md:text-3xl font-bold whitespace-nowrap text-slate-800 dark:text-slate-100"
+                />
+
+                {/* Typewriter greeting */}
+                <TypewriterText
+                  words={TYPEWRITER_GREETINGS}
+                  className="text-sm text-slate-500 dark:text-slate-400 max-w-xs"
+                  typingSpeed={60}
+                  deletingSpeed={30}
+                  pauseDuration={2000}
+                  cursorClassName="bg-violet-500"
+                />
+
+                {/* Suggestions */}
+                <div className="flex flex-wrap gap-2 justify-center max-w-lg mt-2">
                   {SUGGESTIONS.map((s) => (
                     <button
                       key={s.label}
@@ -258,6 +267,7 @@ export default function AiAgentPage() {
               </div>
             )}
 
+            {/* ── Rendered messages ─── */}
             {messages.map((msg) => {
               const isUser = msg.role === 'user';
               return (
@@ -267,7 +277,16 @@ export default function AiAgentPage() {
                   </div>
                   <div className={cn('max-w-[80%] space-y-1', isUser && 'items-end')}>
                     <div className={cn('px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap', isUser ? 'bg-blue-600 text-white rounded-br-md' : 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-bl-md')}>
-                      {msg.content}
+                      {isUser ? (
+                        msg.content
+                      ) : (
+                        <TypewriterReveal
+                          text={msg.content}
+                          speed={2}
+                          intervalMs={15}
+                          cursorClassName="bg-violet-500"
+                        />
+                      )}
                     </div>
                     <div className={cn('flex items-center gap-2 text-[11px] text-slate-400 dark:text-slate-500 px-1', isUser && 'justify-end')}>
                       <span>{format(msg.timestamp, 'HH:mm', { locale: vi })}</span>
@@ -278,13 +297,15 @@ export default function AiAgentPage() {
               );
             })}
 
+            {/* ── Streaming indicator ─── */}
             {isLoading && (
               <div className="flex gap-3 mb-4">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0">
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
                 <div className="max-w-[80%] space-y-1">
-                  {statusText && !streamingText && (
+                  {/* Status text (tool calls, thinking) */}
+                  {statusText && (
                     <div className="px-4 py-2.5 rounded-2xl rounded-bl-md bg-slate-100 dark:bg-slate-700">
                       <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                         <Loader2 className="w-3.5 h-3.5 animate-spin text-violet-500" />
@@ -292,13 +313,9 @@ export default function AiAgentPage() {
                       </div>
                     </div>
                   )}
-                  {streamingText && (
-                    <div className="px-4 py-2.5 rounded-2xl rounded-bl-md bg-slate-100 dark:bg-slate-700 text-sm leading-relaxed whitespace-pre-wrap text-slate-800 dark:text-slate-100">
-                      {streamingText}
-                      <span className="inline-block w-[2px] h-[1em] bg-violet-500 ml-0.5 align-text-bottom animate-blink" />
-                    </div>
-                  )}
-                  {!statusText && !streamingText && (
+
+                  {/* Bouncing dots (initial, before any status arrives) */}
+                  {!statusText && (
                     <div className="px-4 py-3 rounded-2xl rounded-bl-md bg-slate-100 dark:bg-slate-700">
                       <div className="flex gap-1">
                         <span className="w-2 h-2 bg-slate-400/40 rounded-full animate-bounce [animation-delay:0ms]" />
@@ -312,42 +329,14 @@ export default function AiAgentPage() {
             )}
           </div>
 
-          {/* ── Input ───────────────────────────────── */}
+          {/* ── Input — PromptInputBox ───────────────── */}
           <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-900 flex-shrink-0">
-            <div className="flex items-end gap-2">
-              <div className="relative flex-1">
-                <Keyboard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
-                <textarea
-                  ref={inputRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Hỏi gì đó..."
-                  rows={1}
-                  className="w-full resize-none rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 pl-10 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent max-h-24 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-colors"
-                  disabled={isLoading}
-                />
-              </div>
-              {isLoading ? (
-                <Button
-                  size="icon"
-                  className="h-10 w-10 rounded-xl bg-red-500 hover:bg-red-600 flex-shrink-0 transition-colors shadow-sm"
-                  onClick={stopStreaming}
-                  title="Dừng phản hồi"
-                >
-                  <Square className="w-4 h-4 fill-white" />
-                </Button>
-              ) : (
-                <Button
-                  size="icon"
-                  className="h-10 w-10 rounded-xl bg-violet-600 hover:bg-violet-700 flex-shrink-0 shadow-sm shadow-violet-500/20"
-                  onClick={handleSend}
-                  disabled={!input.trim()}
-                >
-                  <Send className="w-4 h-4" />
-                </Button>
-              )}
-            </div>
+            <PromptInputBox
+              onSend={(message) => handleSend(message)}
+              isLoading={isLoading}
+              onStop={stopStreaming}
+              placeholder={`Hỏi RenTaff bất kỳ điều gì...`}
+            />
           </div>
         </div>
       </div>

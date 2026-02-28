@@ -5,7 +5,7 @@ import { vi } from 'date-fns/locale';
 import { Bot, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { TextMorph } from '@/components/ui/text-morph';
+import { ShutterText } from '@/components/ui/shutter-text';
 
 interface AiMessageProps {
     role: 'user' | 'assistant';
@@ -57,9 +57,7 @@ export function AiMessage({ role, content, timestamp, isStreaming, usage }: AiMe
                 >
                     {!isUser && isStreaming ? (
                         <>
-                            <TextMorph charDuration={20} staggerDelay={0.5}>
-                                {content}
-                            </TextMorph>
+                            <ShutterText text={content} trigger="auto" className="text-sm" />
                             <span className="inline-block w-[2px] h-[1em] bg-violet-500 ml-0.5 align-text-bottom animate-blink" />
                         </>
                     ) : (
