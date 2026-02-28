@@ -28,6 +28,75 @@ export function useAiChat() {
     const [statusText, setStatusText] = useState('');
     const abortRef = useRef<AbortController | null>(null);
 
+    // ─── Typewriter buffer ───────────────────────────────────────
+    // Tokens arrive in bursts from SSE. We buffer them and reveal
+    // characters smoothly via requestAnimationFrame for a ChatGPT-like feel.
+    const bufferRef = useRef('');           // queued text not yet displayed
+    const displayedRef = useRef('');        // what's currently shown
+    const rafRef = useRef<number | null>(null);
+    const lastFrameRef = useRef(0);
+
+    const CHARS_PER_FRAME = 2;  // characters to reveal per ~16ms frame
+    const MIN_FRAME_MS = 12;    // minimum ms between reveals
+
+    const tickTypewriter = useCallback(() => {
+        const now = performance.now();
+        if (now - lastFrameRef.current < MIN_FRAME_MS) {
+            rafRef.current = requestAnimationFrame(tickTypewriter);
+            return;
+        }
+        lastFrameRef.current = now;
+
+        if (bufferRef.current.length > 0) {
+            // Reveal a few chars from the buffer
+            const chunk = bufferRef.current.slice(0, CHARS_PER_FRAME);
+            bufferRef.current = bufferRef.current.slice(CHARS_PER_FRAME);
+            displayedRef.current += chunk;
+            setStreamingText(displayedRef.current);
+            rafRef.current = requestAnimationFrame(tickTypewriter);
+        } else {
+            // Buffer empty — stop the loop, it'll restart when new tokens arrive
+            rafRef.current = null;
+        }
+    }, []);
+
+    const enqueueTokens = useCallback((text: string) => {
+        bufferRef.current += text;
+        // Start the typewriter loop if not already running
+        if (rafRef.current === null) {
+            rafRef.current = requestAnimationFrame(tickTypewriter);
+        }
+    }, [tickTypewriter]);
+
+    // Flush remaining buffer instantly (used on done/stop)
+    const flushBuffer = useCallback(() => {
+        if (rafRef.current !== null) {
+            cancelAnimationFrame(rafRef.current);
+            rafRef.current = null;
+        }
+        if (bufferRef.current.length > 0) {
+            displayedRef.current += bufferRef.current;
+            bufferRef.current = '';
+        }
+    }, []);
+
+    const resetTypewriter = useCallback(() => {
+        if (rafRef.current !== null) {
+            cancelAnimationFrame(rafRef.current);
+            rafRef.current = null;
+        }
+        bufferRef.current = '';
+        displayedRef.current = '';
+        setStreamingText('');
+    }, []);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+        };
+    }, []);
+
     const scrollRef = useRef<HTMLDivElement>(null);
 
     // Auto-scroll on new messages or streaming text changes
@@ -83,9 +152,9 @@ export function useAiChat() {
     const startNewConversation = useCallback(async () => {
         setConversationId(null);
         setMessages([]);
-        setStreamingText('');
+        resetTypewriter();
         setStatusText('');
-    }, []);
+    }, [resetTypewriter]);
 
     // ─── Stop streaming ────────────────────────────────────────
     const stopStreaming = useCallback(() => {
@@ -94,23 +163,23 @@ export function useAiChat() {
             abortRef.current = null;
         }
 
-        // If there's any streamed text, save it as a partial message
-        setStreamingText((current) => {
-            if (current.trim()) {
-                const partialMsg: ChatMessage = {
-                    id: `ai-partial-${Date.now()}`,
-                    role: 'assistant',
-                    content: current + ' ⏹',
-                    timestamp: new Date(),
-                };
-                setMessages((prev) => [...prev, partialMsg]);
-            }
-            return '';
-        });
+        // Flush remaining buffer so we capture all received text
+        flushBuffer();
+        const fullText = displayedRef.current;
+        if (fullText.trim()) {
+            const partialMsg: ChatMessage = {
+                id: `ai-partial-${Date.now()}`,
+                role: 'assistant',
+                content: fullText + ' ⏹',
+                timestamp: new Date(),
+            };
+            setMessages((prev) => [...prev, partialMsg]);
+        }
+        resetTypewriter();
 
         setStatusText('');
         setIsLoading(false);
-    }, []);
+    }, [flushBuffer, resetTypewriter]);
 
     // ─── Send message (streaming) ──────────────────────────────
     const sendMessage = useCallback(
@@ -118,7 +187,7 @@ export function useAiChat() {
             if (!text.trim() || isLoading) return;
 
             setIsLoading(true);
-            setStreamingText('');
+            resetTypewriter();
             setStatusText('');
 
             // Add user message immediately
@@ -150,9 +219,11 @@ export function useAiChat() {
                         },
                         onToken: (tokenText) => {
                             setStatusText(''); // Clear status when tokens start
-                            setStreamingText((prev) => prev + tokenText);
+                            enqueueTokens(tokenText);
                         },
                         onDone: (data) => {
+                            // Flush any remaining buffered chars instantly
+                            flushBuffer();
                             // Finalise: add the full message and clear streaming state
                             const aiMsg: ChatMessage = {
                                 id: `ai-${Date.now()}`,
@@ -162,7 +233,7 @@ export function useAiChat() {
                                 usage: data.usage,
                             };
                             setMessages((prev) => [...prev, aiMsg]);
-                            setStreamingText('');
+                            resetTypewriter();
                             setStatusText('');
                             setIsLoading(false);
                             abortRef.current = null;
@@ -176,26 +247,25 @@ export function useAiChat() {
                                 timestamp: new Date(),
                             };
                             setMessages((prev) => [...prev, errorAiMsg]);
-                            setStreamingText('');
+                            resetTypewriter();
                             setStatusText('');
                             setIsLoading(false);
                             abortRef.current = null;
                         },
                         onComplete: () => {
                             // Fallback: if done wasn't received but stream ended
-                            setStreamingText((current) => {
-                                if (current.trim() && abortRef.current) {
-                                    // Stream ended without done event — save what we have
-                                    const partialMsg: ChatMessage = {
-                                        id: `ai-${Date.now()}`,
-                                        role: 'assistant',
-                                        content: current,
-                                        timestamp: new Date(),
-                                    };
-                                    setMessages((prev) => [...prev, partialMsg]);
-                                }
-                                return '';
-                            });
+                            flushBuffer();
+                            const fullText = displayedRef.current;
+                            if (fullText.trim() && abortRef.current) {
+                                const partialMsg: ChatMessage = {
+                                    id: `ai-${Date.now()}`,
+                                    role: 'assistant',
+                                    content: fullText,
+                                    timestamp: new Date(),
+                                };
+                                setMessages((prev) => [...prev, partialMsg]);
+                            }
+                            resetTypewriter();
                             setStatusText('');
                             setIsLoading(false);
                             abortRef.current = null;
@@ -217,7 +287,7 @@ export function useAiChat() {
                 setIsLoading(false);
             }
         },
-        [conversationId, isLoading, refetchConversations, refetchUsage],
+        [conversationId, isLoading, refetchConversations, refetchUsage, enqueueTokens, flushBuffer, resetTypewriter],
     );
 
     // Delete conversation
