@@ -29,9 +29,16 @@ export interface AdminUser {
   createdAt: string;
 }
 
+export interface PopulatedOwner {
+  _id: string;
+  email: string;
+  fullName: string;
+  phone?: string;
+}
+
 export interface AdminSubscription {
   _id: string;
-  ownerId: string;
+  ownerId: string | PopulatedOwner;
   plan: string;
   status: string;
   currentPeriodStart: string;
@@ -97,4 +104,16 @@ export const adminService = {
 
   activatePlan: (data: { ownerId: string; plan: string; months: number; notes?: string }) =>
     api.post<{ data: AdminSubscription }>('/subscriptions/activate', data).then((r) => r.data.data),
+
+  getPaymentSettings: () =>
+    api.get<{ data: { configured: boolean; partnerCode: string | null; isActive: boolean; environment: string } }>('/subscriptions/admin-payment-settings').then((r) => r.data.data),
+
+  upsertPaymentSettings: (dto: {
+    provider?: string;
+    momoPartnerCode?: string;
+    momoAccessKey?: string;
+    momoSecretKey?: string;
+    isActive?: boolean;
+  }) =>
+    api.put<{ data: { configured: boolean; partnerCode: string | null; isActive: boolean; environment: string } }>('/subscriptions/admin-payment-settings', dto).then((r) => r.data.data),
 };

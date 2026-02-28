@@ -5,7 +5,7 @@ import { CreditCard, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { adminService, AdminSubscription } from '@/services/admin.service';
+import { adminService, AdminSubscription, PopulatedOwner } from '@/services/admin.service';
 
 const PLAN_COLORS: Record<string, string> = {
   free: 'bg-gray-100 text-gray-700',
@@ -195,7 +195,7 @@ export default function AdminSubscriptionsPage() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="text-left px-4 py-3 text-gray-500 font-medium">Owner ID</th>
+                  <th className="text-left px-4 py-3 text-gray-500 font-medium">Chủ trọ</th>
                   <th className="text-left px-4 py-3 text-gray-500 font-medium">Gói</th>
                   <th className="text-left px-4 py-3 text-gray-500 font-medium">Trạng thái</th>
                   <th className="text-left px-4 py-3 text-gray-500 font-medium">Giới hạn BĐS</th>
@@ -207,8 +207,15 @@ export default function AdminSubscriptionsPage() {
               <tbody className="divide-y divide-gray-100">
                 {subs.map((sub) => (
                   <tr key={sub._id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 font-mono text-xs text-gray-500">
-                      {sub.ownerId.slice(-8)}...
+                    <td className="px-4 py-3">
+                      {typeof sub.ownerId === 'object' ? (
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{(sub.ownerId as PopulatedOwner).fullName}</p>
+                          <p className="text-xs text-gray-400">{(sub.ownerId as PopulatedOwner).email}</p>
+                        </div>
+                      ) : (
+                        <span className="font-mono text-xs text-gray-500">{sub.ownerId.slice(-8)}...</span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <span

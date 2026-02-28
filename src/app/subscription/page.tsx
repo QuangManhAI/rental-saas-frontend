@@ -191,8 +191,22 @@ function UpgradeDialog({ open, onClose, fromPlan, toPlan }: {
   const total = (plan?.priceNum ?? 0) * months;
 
   const { mutate, isPending } = useMutation({
-    mutationFn: () => api.post('/subscriptions/request-upgrade', { toPlan, months, paymentMethod: method }).then((r) => r.data),
-    onSuccess: () => {
+    mutationFn: async () => {
+      if (method === 'momo') {
+        // MoMo: create payment and redirect to MoMo
+        const res = await api.post('/subscriptions/create-momo-payment', { toPlan, months });
+        return res.data.data ?? res.data;
+      }
+      // Bank transfer: submit upgrade request for admin approval
+      const res = await api.post('/subscriptions/request-upgrade', { toPlan, months, paymentMethod: method });
+      return res.data;
+    },
+    onSuccess: (data: any) => {
+      if (method === 'momo' && data?.payUrl) {
+        toast.success('Đang chuyển đến MoMo...');
+        window.location.href = data.payUrl;
+        return;
+      }
       toast.success('Yêu cầu nâng cấp đã gửi! Admin sẽ xét duyệt trong 24h.');
       qc.invalidateQueries({ queryKey: ['subscription', 'payment-history'] });
       onClose();
@@ -280,14 +294,18 @@ function UpgradeDialog({ open, onClose, fromPlan, toPlan }: {
           </div>
 
           <p className="text-xs text-gray-400 leading-relaxed">
-            Admin sẽ xác nhận thanh toán và kích hoạt trong vòng 24 giờ. Bạn sẽ nhận email khi được duyệt.
+            {method === 'momo'
+              ? 'Bạn sẽ được chuyển đến MoMo để thanh toán. Gói sẽ tự động kích hoạt sau khi thanh toán thành công.'
+              : 'Admin sẽ xác nhận thanh toán và kích hoạt trong vòng 24 giờ. Bạn sẽ nhận email khi được duyệt.'}
           </p>
         </div>
 
         <div className="flex gap-3 px-6 pb-5">
           <Button variant="outline" className="flex-1" onClick={onClose} disabled={isPending}>Hủy</Button>
           <Button className="flex-1 bg-indigo-600 hover:bg-indigo-700" onClick={() => mutate()} disabled={isPending}>
-            {isPending ? 'Đang gửi...' : 'Gửi yêu cầu'}
+            {isPending
+              ? (method === 'momo' ? 'Đang xử lý...' : 'Đang gửi...')
+              : (method === 'momo' ? 'Thanh toán MoMo' : 'Gửi yêu cầu')}
           </Button>
         </div>
       </div>

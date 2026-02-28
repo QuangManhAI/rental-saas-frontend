@@ -3,7 +3,7 @@
 import { useEffect, useSyncExternalStore } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Building2, LayoutDashboard, Users, CreditCard, Activity, LogOut } from 'lucide-react';
+import { Building2, LayoutDashboard, Users, CreditCard, Activity, LogOut, Settings } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { Role } from '@/types/enums';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/admin/users', label: 'Người dùng', icon: Users },
   { href: '/admin/subscriptions', label: 'Gói dịch vụ', icon: CreditCard },
+  { href: '/admin/payment-settings', label: 'Cài đặt thanh toán', icon: Settings },
   { href: '/admin/health', label: 'System Health', icon: Activity },
 ];
 
