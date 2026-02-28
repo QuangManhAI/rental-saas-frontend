@@ -234,7 +234,7 @@ export default function AiAgentPage() {
 
                 {/* GooeyText agent name */}
                 <GooeyText
-                  texts={["Hello!", "I'm RenTaff", 'Your Agent AI']}
+                  texts={["Hello!", "I'm RenTaff", 'Your AI Agent']}
                   morphTime={1.5}
                   cooldownTime={1.5}
                   className="h-12 w-full mt-5"
