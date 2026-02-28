@@ -6,6 +6,7 @@ import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { DatePickerField } from '@/components/ui/date-picker-field';
 import { Button } from '@/components/ui/button';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -113,7 +114,7 @@ export function ContractForm({
               <FormItem>
                 <FormLabel>Ngày bắt đầu</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <DatePickerField value={field.value} onChange={field.onChange} placeholder="Chọn ngày" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -127,7 +128,7 @@ export function ContractForm({
               <FormItem>
                 <FormLabel>Ngày kết thúc</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <DatePickerField value={field.value} onChange={field.onChange} placeholder="Chọn ngày" />
                 </FormControl>
                 <FormMessage />
               </FormItem>

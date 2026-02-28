@@ -5,6 +5,7 @@ import { usePayments } from '@/hooks/use-payments';
 import { PageHeader, LoadingSkeleton, EmptyState } from '@/components/shared';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { DatePickerField } from '@/components/ui/date-picker-field';
 import { Button } from '@/components/ui/button';
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -93,20 +94,20 @@ export default function PaymentsPage() {
 
                         <div className="space-y-1">
                             <label className="text-sm text-muted-foreground">Từ ngày</label>
-                            <Input
-                                type="date"
+                            <DatePickerField
                                 value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
+                                onChange={setStartDate}
+                                placeholder="Chọn ngày"
                                 className="w-[160px]"
                             />
                         </div>
 
                         <div className="space-y-1">
                             <label className="text-sm text-muted-foreground">Đến ngày</label>
-                            <Input
-                                type="date"
+                            <DatePickerField
                                 value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
+                                onChange={setEndDate}
+                                placeholder="Chọn ngày"
                                 className="w-[160px]"
                             />
                         </div>

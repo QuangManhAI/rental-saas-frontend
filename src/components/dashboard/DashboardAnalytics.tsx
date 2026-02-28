@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { DatePickerField } from '@/components/ui/date-picker-field';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
     BarChart,
@@ -114,20 +115,20 @@ export default function DashboardAnalytics() {
 
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Từ ngày</label>
-                            <Input
-                                type="date"
+                            <DatePickerField
                                 value={from}
-                                onChange={(e) => setFrom(e.target.value)}
+                                onChange={setFrom}
+                                placeholder="Chọn ngày"
                                 className="w-[160px]"
                             />
                         </div>
 
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Đến ngày</label>
-                            <Input
-                                type="date"
+                            <DatePickerField
                                 value={to}
-                                onChange={(e) => setTo(e.target.value)}
+                                onChange={setTo}
+                                placeholder="Chọn ngày"
                                 className="w-[160px]"
                             />
                         </div>

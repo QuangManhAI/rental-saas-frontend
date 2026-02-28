@@ -6,6 +6,7 @@ import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { DatePickerField } from '@/components/ui/date-picker-field';
 import { Button } from '@/components/ui/button';
 import { tenantSchema, type TenantFormValues } from '@/lib/validators';
 import { Loader2 } from 'lucide-react';
@@ -119,7 +120,7 @@ export function TenantForm({
               <FormItem>
                 <FormLabel>Ngày sinh</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <DatePickerField value={field.value} onChange={field.onChange} placeholder="Chọn ngày sinh" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
