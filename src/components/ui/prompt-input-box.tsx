@@ -55,7 +55,7 @@ const PromptTextarea = React.forwardRef<
         <textarea
             ref={textareaRef}
             className={cn(
-                'flex min-h-[40px] md:min-h-[44px] w-full resize-none rounded-md border-none bg-transparent px-3 py-1.5 md:py-2.5 text-sm md:text-base placeholder:opacity-50 focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50',
+                'flex min-h-[20px] md:min-h-[44px] w-full resize-none rounded-md border-none bg-transparent px-3 py-1 md:py-2.5 text-sm md:text-base placeholder:opacity-50 focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50',
                 // Text color adapts to theme
                 'text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500',
                 className,
