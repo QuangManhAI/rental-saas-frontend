@@ -31,13 +31,34 @@ export function useAiChat() {
     // ─── Typewriter buffer ───────────────────────────────────────
     // Tokens arrive in bursts from SSE. We buffer them and reveal
     // characters smoothly via requestAnimationFrame for a ChatGPT-like feel.
+    // When `onDone` fires, we store the done data and let the typewriter
+    // drain the buffer naturally before finalizing the message.
     const bufferRef = useRef('');           // queued text not yet displayed
     const displayedRef = useRef('');        // what's currently shown
     const rafRef = useRef<number | null>(null);
     const lastFrameRef = useRef(0);
+    const pendingDoneRef = useRef<{ reply: string; usage: AiSendResponse['usage'] } | null>(null);
 
     const CHARS_PER_FRAME = 1;  // characters to reveal per frame
     const MIN_FRAME_MS = 25;    // minimum ms between reveals (~40 chars/sec)
+
+    const finalizeDone = useCallback((data: { reply: string; usage: AiSendResponse['usage'] }) => {
+        const aiMsg: ChatMessage = {
+            id: `ai-${Date.now()}`,
+            role: 'assistant',
+            content: data.reply,
+            timestamp: new Date(),
+            usage: data.usage,
+        };
+        setMessages((prev) => [...prev, aiMsg]);
+        bufferRef.current = '';
+        displayedRef.current = '';
+        setStreamingText('');
+        setStatusText('');
+        setIsLoading(false);
+        abortRef.current = null;
+        pendingDoneRef.current = null;
+    }, []);
 
     const tickTypewriter = useCallback(() => {
         const now = performance.now();
@@ -48,27 +69,39 @@ export function useAiChat() {
         lastFrameRef.current = now;
 
         if (bufferRef.current.length > 0) {
-            // Reveal a few chars from the buffer
             const chunk = bufferRef.current.slice(0, CHARS_PER_FRAME);
             bufferRef.current = bufferRef.current.slice(CHARS_PER_FRAME);
             displayedRef.current += chunk;
             setStreamingText(displayedRef.current);
             rafRef.current = requestAnimationFrame(tickTypewriter);
+        } else if (pendingDoneRef.current) {
+            // Buffer drained & done event was received → finalize
+            rafRef.current = null;
+            finalizeDone(pendingDoneRef.current);
         } else {
-            // Buffer empty — stop the loop, it'll restart when new tokens arrive
+            // Buffer empty, waiting for more tokens
             rafRef.current = null;
         }
-    }, []);
+    }, [finalizeDone]);
 
     const enqueueTokens = useCallback((text: string) => {
         bufferRef.current += text;
-        // Start the typewriter loop if not already running
         if (rafRef.current === null) {
             rafRef.current = requestAnimationFrame(tickTypewriter);
         }
     }, [tickTypewriter]);
 
-    // Flush remaining buffer instantly (used on done/stop)
+    // Mark stream as done — typewriter will finalize when buffer drains
+    const markDone = useCallback((data: { reply: string; usage: AiSendResponse['usage'] }) => {
+        pendingDoneRef.current = data;
+        // If buffer is already empty, finalize immediately
+        if (bufferRef.current.length === 0 && rafRef.current === null) {
+            finalizeDone(data);
+        }
+        // Otherwise the tick loop will pick it up when buffer drains
+    }, [finalizeDone]);
+
+    // Flush remaining buffer instantly (used on stop)
     const flushBuffer = useCallback(() => {
         if (rafRef.current !== null) {
             cancelAnimationFrame(rafRef.current);
@@ -87,6 +120,7 @@ export function useAiChat() {
         }
         bufferRef.current = '';
         displayedRef.current = '';
+        pendingDoneRef.current = null;
         setStreamingText('');
     }, []);
 
@@ -222,21 +256,9 @@ export function useAiChat() {
                             enqueueTokens(tokenText);
                         },
                         onDone: (data) => {
-                            // Flush any remaining buffered chars instantly
-                            flushBuffer();
-                            // Finalise: add the full message and clear streaming state
-                            const aiMsg: ChatMessage = {
-                                id: `ai-${Date.now()}`,
-                                role: 'assistant',
-                                content: data.reply,
-                                timestamp: new Date(),
-                                usage: data.usage,
-                            };
-                            setMessages((prev) => [...prev, aiMsg]);
-                            resetTypewriter();
-                            setStatusText('');
-                            setIsLoading(false);
-                            abortRef.current = null;
+                            // Let the typewriter drain the buffer naturally,
+                            // then finalize the message when all chars are revealed.
+                            markDone(data);
                             refetchUsage();
                         },
                         onError: (errMsg) => {
@@ -287,7 +309,7 @@ export function useAiChat() {
                 setIsLoading(false);
             }
         },
-        [conversationId, isLoading, refetchConversations, refetchUsage, enqueueTokens, flushBuffer, resetTypewriter],
+        [conversationId, isLoading, refetchConversations, refetchUsage, enqueueTokens, markDone, flushBuffer, resetTypewriter],
     );
 
     // Delete conversation
