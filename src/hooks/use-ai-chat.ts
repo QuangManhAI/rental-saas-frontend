@@ -169,6 +169,7 @@ export function useAiChat() {
                         role: m.role as 'user' | 'assistant',
                         content: m.content,
                         timestamp: new Date(m.createdAt),
+                        streamed: true, // loaded from history — skip typewriter
                     })),
             );
         } catch {

@@ -259,7 +259,7 @@ export function AiAgentDesktop({
                                     </div>
                                     <div className={cn('max-w-[80%] space-y-1', isUser && 'items-end')}>
                                         <div className={cn('px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap', isUser ? 'bg-blue-600 text-white rounded-br-md' : 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-bl-md')}>
-                                            {isUser ? (
+                                            {isUser || msg.streamed ? (
                                                 msg.content
                                             ) : (
                                                 <TypewriterReveal

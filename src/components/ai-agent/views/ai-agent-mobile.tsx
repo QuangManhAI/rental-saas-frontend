@@ -69,7 +69,8 @@ export function AiAgentMobile({
 
     return (
         <div className={cn(darkMode && 'dark', 'lg:hidden')}>
-            <div className="flex flex-col h-[calc(100dvh-64px-32px)] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+            {/* 100svh = smallest viewport (accounts for browser chrome). Subtract Topbar(64px) + layout padding(32px) */}
+            <div className="flex flex-col h-[calc(100svh-96px)] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
 
                 {/* ═══ Header ═══ */}
                 <div className="flex items-center justify-between px-2 h-11 border-b border-slate-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm flex-shrink-0">
@@ -96,14 +97,8 @@ export function AiAgentMobile({
                             </SheetTrigger>
                             <SheetContent side="left" className="w-[280px] p-0 flex flex-col">
                                 <SheetHeader className="p-4 border-b border-slate-100 dark:border-slate-800 text-left">
-                                    <SheetTitle className="text-base flex items-center justify-between">
+                                    <SheetTitle className="text-base">
                                         Lịch sử trò chuyện
-                                        <button
-                                            onClick={() => { startNewConversation(); setSheetOpen(false); }}
-                                            className="p-1.5 rounded-lg bg-violet-50 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/50 transition-colors"
-                                        >
-                                            <Plus className="w-4 h-4" />
-                                        </button>
                                     </SheetTitle>
                                 </SheetHeader>
                                 <div className="flex-1 overflow-y-auto px-2 py-3 space-y-1">
@@ -227,7 +222,7 @@ export function AiAgentMobile({
                                                     ? 'bg-blue-600 text-white rounded-tr-sm shadow-sm'
                                                     : 'bg-slate-100 dark:bg-slate-800 border border-slate-50 dark:border-slate-700/50 text-slate-800 dark:text-slate-100 rounded-tl-sm',
                                             )}>
-                                                {isUser ? (
+                                                {isUser || msg.streamed ? (
                                                     msg.content
                                                 ) : (
                                                     <TypewriterReveal

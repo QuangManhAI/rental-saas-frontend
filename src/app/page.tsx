@@ -18,6 +18,7 @@ import {
   useTransform,
   useInView,
   AnimatePresence,
+  MotionConfig,
 } from 'framer-motion';
 
 // ─── Animation Variants ──────────────────────────────────────────────────────
@@ -64,16 +65,24 @@ const staggerContainer = {
 };
 
 // ─── Animated Section Wrapper ────────────────────────────────────────────────
+// On mobile (<=1024px), renders a plain div — zero JS animation overhead.
 
 function AnimatedSection({
   children,
   className = '',
+  mobile,
 }: {
   children: React.ReactNode;
   className?: string;
+  mobile?: boolean;
 }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
+
+  if (mobile) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
       ref={ref}
@@ -371,7 +380,7 @@ export default function LandingPage() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, isMobile ? 1 : 0]);
 
   useEffect(() => {
-    const mql = window.matchMedia('(max-width: 768px)');
+    const mql = window.matchMedia('(max-width: 1024px)');
     setIsMobile(mql.matches);
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
     mql.addEventListener('change', handler);
@@ -379,6 +388,7 @@ export default function LandingPage() {
   }, []);
 
   return (
+    <MotionConfig reducedMotion={isMobile ? 'always' : 'never'}>
     <div className="min-h-screen bg-white text-gray-900 antialiased overflow-x-hidden relative">
       {/* ── Stripe-style gradient mesh background ── */}
       <div className="stripe-gradient-bg" aria-hidden />
@@ -662,7 +672,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Trusted By / Social Proof Bar ── */}
-      <AnimatedSection>
+      <AnimatedSection mobile={isMobile}>
         <motion.section
           variants={fadeIn}
           className="py-12 border-b border-gray-200/60"
@@ -682,7 +692,7 @@ export default function LandingPage() {
       <section className="pt-20 sm:pt-28 pb-20 sm:pb-28 relative">
         <GradientOrb className="w-[500px] h-[500px] top-0 left-1/2 -translate-x-1/2" color="purple" />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
-          <AnimatedSection>
+          <AnimatedSection mobile={isMobile}>
             <motion.div variants={fadeUp} className="text-center mb-14">
               <p className="text-red-500 font-semibold text-sm tracking-wide uppercase mb-3">Vấn đề thường gặp</p>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
@@ -692,7 +702,7 @@ export default function LandingPage() {
             </motion.div>
           </AnimatedSection>
 
-          <AnimatedSection>
+          <AnimatedSection mobile={isMobile}>
             <motion.div variants={staggerContainer} className="grid md:grid-cols-3 gap-6">
               {PAIN_POINTS.map((item, i) => (
                 <motion.div
@@ -715,7 +725,7 @@ export default function LandingPage() {
             </motion.div>
           </AnimatedSection>
 
-          <AnimatedSection>
+          <AnimatedSection mobile={isMobile}>
             <motion.div variants={fadeUp} className="mt-10 text-center">
               <p className="text-indigo-600 font-semibold text-lg flex items-center justify-center gap-2">
                 <ArrowRight className="w-5 h-5" />
@@ -730,7 +740,7 @@ export default function LandingPage() {
       <section id="features" className="py-20 sm:py-28 bg-gray-50/80 border-y border-gray-200/60 relative">
         <GradientOrb className="w-[400px] h-[400px] top-20 -right-20" color="blue" />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
-          <AnimatedSection>
+          <AnimatedSection mobile={isMobile}>
             <motion.div variants={fadeUp} className="text-center mb-14">
               <p className="text-indigo-600 font-semibold text-sm tracking-wide uppercase mb-3">Tính năng</p>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
@@ -742,7 +752,7 @@ export default function LandingPage() {
             </motion.div>
           </AnimatedSection>
 
-          <AnimatedSection>
+          <AnimatedSection mobile={isMobile}>
             <motion.div variants={staggerContainer} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {FEATURES.map((f, i) => (
                 <motion.div
@@ -780,7 +790,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-24 relative">
           {/* Row 1 — Invoice */}
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <AnimatedSection>
+            <AnimatedSection mobile={isMobile}>
               <motion.div variants={slideInLeft}>
                 <p className="text-emerald-600 font-semibold text-sm tracking-wide uppercase mb-3">Hóa đơn tự động</p>
                 <h3 className="text-3xl font-bold text-gray-900 mb-4">
@@ -803,7 +813,7 @@ export default function LandingPage() {
               </motion.div>
             </AnimatedSection>
 
-            <AnimatedSection>
+            <AnimatedSection mobile={isMobile}>
               <motion.div variants={slideInRight} className="relative">
                 <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500/15 to-teal-500/15 rounded-3xl blur-2xl -z-10" />
                 <div className="bg-white rounded-2xl border border-gray-200/60 shadow-xl overflow-hidden">
@@ -840,7 +850,7 @@ export default function LandingPage() {
 
           {/* Row 2 — Payment */}
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <AnimatedSection>
+            <AnimatedSection mobile={isMobile}>
               <motion.div variants={slideInLeft} className="order-2 lg:order-1 relative">
                 <div className="absolute -inset-2 bg-gradient-to-r from-violet-500/15 to-pink-500/15 rounded-3xl blur-2xl -z-10" />
                 <div className="bg-white rounded-2xl border border-gray-200/60 shadow-xl p-6">
@@ -870,7 +880,7 @@ export default function LandingPage() {
               </motion.div>
             </AnimatedSection>
 
-            <AnimatedSection>
+            <AnimatedSection mobile={isMobile}>
               <motion.div variants={slideInRight} className="order-1 lg:order-2">
                 <p className="text-violet-600 font-semibold text-sm tracking-wide uppercase mb-3">Thanh toán thông minh</p>
                 <h3 className="text-3xl font-bold text-gray-900 mb-4">
@@ -902,7 +912,7 @@ export default function LandingPage() {
         <div className="hidden md:block absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-violet-500/10 rounded-full blur-[120px]" />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
-          <AnimatedSection>
+          <AnimatedSection mobile={isMobile}>
             <motion.div variants={fadeUp} className="text-center mb-14">
               <p className="text-indigo-400 font-semibold text-sm tracking-wide uppercase mb-3">Tại sao chọn chúng tôi</p>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
@@ -914,7 +924,7 @@ export default function LandingPage() {
             </motion.div>
           </AnimatedSection>
 
-          <AnimatedSection>
+          <AnimatedSection mobile={isMobile}>
             <motion.div variants={staggerContainer} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 {
@@ -978,7 +988,7 @@ export default function LandingPage() {
       {/* ── How It Works ── */}
       <section id="how-it-works" className="py-20 sm:py-28 border-b border-gray-200/60 relative">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
-          <AnimatedSection>
+          <AnimatedSection mobile={isMobile}>
             <motion.div variants={fadeUp} className="text-center mb-14">
               <p className="text-emerald-600 font-semibold text-sm tracking-wide uppercase mb-3">Cách hoạt động</p>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
@@ -988,7 +998,7 @@ export default function LandingPage() {
             </motion.div>
           </AnimatedSection>
 
-          <AnimatedSection>
+          <AnimatedSection mobile={isMobile}>
             <motion.div variants={staggerContainer} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {HOW_IT_WORKS.map((step, i) => (
                 <motion.div
@@ -1024,7 +1034,7 @@ export default function LandingPage() {
       <section id="pricing" className="py-20 sm:py-28 bg-gray-50/80 border-b border-gray-200/60 relative">
         <GradientOrb className="w-[500px] h-[500px] -right-20 top-1/2 -translate-y-1/2" color="indigo" />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
-          <AnimatedSection>
+          <AnimatedSection mobile={isMobile}>
             <motion.div variants={fadeUp} className="text-center mb-14">
               <p className="text-violet-600 font-semibold text-sm tracking-wide uppercase mb-3">Bảng giá</p>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">Bảng giá rõ ràng, không ẩn phí</h2>
@@ -1032,7 +1042,7 @@ export default function LandingPage() {
             </motion.div>
           </AnimatedSection>
 
-          <AnimatedSection>
+          <AnimatedSection mobile={isMobile}>
             <motion.div variants={staggerContainer} className="grid md:grid-cols-3 gap-6 items-start">
               {PRICING.map((plan, i) => (
                 <motion.div
@@ -1096,7 +1106,7 @@ export default function LandingPage() {
       {/* ── Testimonials ── */}
       <section id="testimonials" className="py-20 sm:py-28 border-b border-gray-200/60 relative">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <AnimatedSection>
+          <AnimatedSection mobile={isMobile}>
             <motion.div variants={fadeUp} className="text-center mb-14">
               <p className="text-amber-600 font-semibold text-sm tracking-wide uppercase mb-3">Đánh giá</p>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">Được tin dùng bởi hàng nghìn chủ nhà</h2>
@@ -1104,7 +1114,7 @@ export default function LandingPage() {
             </motion.div>
           </AnimatedSection>
 
-          <AnimatedSection>
+          <AnimatedSection mobile={isMobile}>
             <motion.div variants={staggerContainer} className="grid md:grid-cols-3 gap-6">
               {TESTIMONIALS.map((t, i) => (
                 <motion.div
@@ -1136,14 +1146,14 @@ export default function LandingPage() {
       {/* ── FAQ ── */}
       <section id="faq" className="py-20 sm:py-28 bg-gray-50/80">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
-          <AnimatedSection>
+          <AnimatedSection mobile={isMobile}>
             <motion.div variants={fadeUp} className="text-center mb-14">
               <p className="text-gray-500 font-semibold text-sm tracking-wide uppercase mb-3">FAQ</p>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">Câu hỏi thường gặp</h2>
             </motion.div>
           </AnimatedSection>
 
-          <AnimatedSection>
+          <AnimatedSection mobile={isMobile}>
             <motion.div
               variants={staggerContainer}
               className="bg-white rounded-2xl border border-gray-200/60 shadow-sm px-6"
@@ -1157,7 +1167,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── CTA Banner ── */}
-      <AnimatedSection>
+      <AnimatedSection mobile={isMobile}>
         <motion.section
           variants={fadeUp}
           className="py-20 sm:py-28 relative overflow-hidden"
@@ -1258,5 +1268,6 @@ export default function LandingPage() {
         </div>
       </footer>
     </div>
+    </MotionConfig>
   );
 }
