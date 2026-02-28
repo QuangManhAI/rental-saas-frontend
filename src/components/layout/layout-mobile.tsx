@@ -120,8 +120,10 @@ export function LayoutMobile({ children }: { children: React.ReactNode }) {
             </header>
 
             {/* Main Content */}
-            <main className={cn('flex-1 p-4', isAiAgent ? 'pb-4' : 'pb-20')}>
-                <div className="mx-auto max-w-7xl">{children}</div>
+            <main className={cn('flex-1 w-full flex flex-col', isAiAgent ? 'p-0 pb-0' : 'p-4 pb-20')}>
+                <div className={cn('mx-auto w-full max-w-7xl flex-1 flex flex-col', isAiAgent && 'max-w-none')}>
+                    {children}
+                </div>
             </main>
 
             {/* Bottom Nav & Chat */}

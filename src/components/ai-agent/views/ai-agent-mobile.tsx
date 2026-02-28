@@ -19,6 +19,7 @@ import {
     CalendarClock,
     Moon,
     Sun,
+    X,
     type LucideIcon,
 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -28,7 +29,6 @@ import { cn } from '@/lib/utils';
 import { PromptInputBox } from '@/components/ui/prompt-input-box';
 import { TypewriterReveal } from '@/components/ui/typewriter-reveal';
 import { AiAgentViewProps } from './ai-agent-desktop';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 const SUGGESTIONS: { icon: LucideIcon; label: string; color: string }[] = [
     { icon: UserPlus, label: 'Thêm khách thuê', color: 'text-blue-500 bg-blue-50 dark:bg-blue-950/40' },
@@ -69,8 +69,8 @@ export function AiAgentMobile({
 
     return (
         <div className={cn(darkMode && 'dark', 'lg:hidden')}>
-            {/* 100svh = smallest viewport (accounts for browser chrome). Subtract Topbar(64px) + layout padding(32px) */}
-            <div className="flex flex-col h-[calc(100svh-96px)] bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+            {/* 100dvh = viewport height. Subtract Topbar(64px). No layout bottom padding needed for AI Agent. */}
+            <div className="flex flex-col h-[calc(100dvh-64px)] bg-white dark:bg-slate-900 border-x-0 sm:border-x border-t border-b-0 border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
 
                 {/* ═══ Header ═══ */}
                 <div className="flex items-center justify-between px-2 h-11 border-b border-slate-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm flex-shrink-0">
@@ -82,56 +82,19 @@ export function AiAgentMobile({
                             <ChevronLeft className="w-5 h-5" />
                         </button>
 
-                        {/* Conversation history sheet */}
-                        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-                            <SheetTrigger asChild>
-                                <button className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-sm">
-                                        <Sparkles className="w-3.5 h-3.5 text-white" />
-                                    </div>
-                                    <div className="text-left leading-tight">
-                                        <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-100">RenTaff</p>
-                                        <p className="text-[10px] text-slate-400">{conversations.length} hội thoại</p>
-                                    </div>
-                                </button>
-                            </SheetTrigger>
-                            <SheetContent side="left" className="w-[280px] p-0 flex flex-col">
-                                <SheetHeader className="p-4 border-b border-slate-100 dark:border-slate-800 text-left">
-                                    <SheetTitle className="text-base">
-                                        Lịch sử trò chuyện
-                                    </SheetTitle>
-                                </SheetHeader>
-                                <div className="flex-1 overflow-y-auto px-2 py-3 space-y-1">
-                                    {conversations.map((conv) => (
-                                        <div
-                                            key={conv._id}
-                                            className={cn(
-                                                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all',
-                                                conversationId === conv._id
-                                                    ? 'bg-violet-50 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 font-medium'
-                                                    : 'text-slate-600 dark:text-slate-400 active:bg-slate-100 dark:active:bg-slate-800',
-                                            )}
-                                            onClick={() => { switchConversation(conv._id); setSheetOpen(false); }}
-                                        >
-                                            <MessageCircle className="w-4 h-4 opacity-40 flex-shrink-0" />
-                                            <span className="truncate flex-1">{conv.title}</span>
-                                            <button
-                                                className="p-1.5 rounded-lg text-slate-300 dark:text-slate-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
-                                                onClick={(e) => { e.stopPropagation(); deleteConversation(conv._id); }}
-                                            >
-                                                <Trash2 className="w-3.5 h-3.5" />
-                                            </button>
-                                        </div>
-                                    ))}
-                                    {conversations.length === 0 && (
-                                        <div className="flex flex-col items-center py-12 text-slate-400">
-                                            <MessageCircle className="w-8 h-8 mb-2 opacity-30" />
-                                            <p className="text-sm">Chưa có hội thoại</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </SheetContent>
-                        </Sheet>
+                        {/* Conversation history button */}
+                        <button
+                            onClick={() => setSheetOpen(true)}
+                            className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        >
+                            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-sm">
+                                <Sparkles className="w-3.5 h-3.5 text-white" />
+                            </div>
+                            <div className="text-left leading-tight">
+                                <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-100">RenTaff</p>
+                                <p className="text-[10px] text-slate-400">{conversations.length} hội thoại</p>
+                            </div>
+                        </button>
                     </div>
 
                     <div className="flex items-center gap-1">
@@ -287,6 +250,63 @@ export function AiAgentMobile({
                     />
                 </div>
             </div>
+
+            {/* CSS-Only Sidebar & Overlay for Lịch sử trò chuyện */}
+            <div
+                className={cn(
+                    'fixed inset-0 z-40 bg-slate-900/50 transition-opacity duration-300',
+                    sheetOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                )}
+                onClick={() => setSheetOpen(false)}
+            />
+
+            <aside
+                className={cn(
+                    'fixed top-0 bottom-0 left-0 z-50 w-[280px] bg-white dark:bg-slate-900 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col',
+                    sheetOpen ? 'translate-x-0' : '-translate-x-full'
+                )}
+            >
+                <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <span className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                        Lịch sử trò chuyện
+                    </span>
+                    <button
+                        onClick={() => setSheetOpen(false)}
+                        className="p-1 -mr-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+                <div className="flex-1 overflow-y-auto px-2 py-3 space-y-1">
+                    {conversations.map((conv) => (
+                        <div
+                            key={conv._id}
+                            className={cn(
+                                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all',
+                                conversationId === conv._id
+                                    ? 'bg-violet-50 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 font-medium'
+                                    : 'text-slate-600 dark:text-slate-400 active:bg-slate-100 dark:active:bg-slate-800',
+                            )}
+                            onClick={() => { switchConversation(conv._id); setSheetOpen(false); }}
+                        >
+                            <MessageCircle className="w-4 h-4 opacity-40 flex-shrink-0" />
+                            <span className="truncate flex-1">{conv.title}</span>
+                            <button
+                                className="p-1.5 rounded-lg text-slate-300 dark:text-slate-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                                onClick={(e) => { e.stopPropagation(); deleteConversation(conv._id); }}
+                            >
+                                <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                        </div>
+                    ))}
+                    {conversations.length === 0 && (
+                        <div className="flex flex-col items-center py-12 text-slate-400">
+                            <MessageCircle className="w-8 h-8 mb-2 opacity-30" />
+                            <p className="text-sm">Chưa có hội thoại</p>
+                        </div>
+                    )}
+                </div>
+            </aside>
         </div>
     );
 }
