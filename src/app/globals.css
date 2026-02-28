@@ -217,40 +217,7 @@
   to { opacity: 1; }
 }
 
-/* ─── Mobile Performance: disable heavy CSS effects on landing page ─── */
-@media (max-width: 1024px) {
-  /* Kill hover transforms & transitions on cards (not hero fade-ins) */
-  .landing-perf *,
-  .landing-perf *::before,
-  .landing-perf *::after {
-    transition-duration: 0s !important;
-    transition-delay: 0s !important;
-  }
-
-  /* Remove blur effects (very expensive on mobile GPUs) */
-  .landing-perf .blur-3xl,
-  .landing-perf .blur-xl,
-  .landing-perf .backdrop-blur-2xl,
-  .landing-perf .backdrop-blur-sm {
-    filter: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-
-  /* Simplify gradient mesh background on mobile */
-  .stripe-gradient-bg {
-    background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%) !important;
-  }
-
-  /* Remove floating mesh orb blurs */
-  .stripe-mesh-1,
-  .stripe-mesh-2,
-  .stripe-mesh-3 {
-    display: none !important;
-  }
-}
-
-/* ─── Mobile hero: lightweight sequential fade-in ─── */
+/* ─── Mobile landing: lightweight sequential fade-in ─── */
 @keyframes mobile-fade-up {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
