@@ -4,6 +4,8 @@ import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { Bot, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
+import { TextMorph } from '@/components/ui/text-morph';
 
 interface AiMessageProps {
     role: 'user' | 'assistant';
@@ -22,18 +24,26 @@ export function AiMessage({ role, content, timestamp, isStreaming, usage }: AiMe
     const isUser = role === 'user';
 
     return (
-        <div className={cn('flex gap-3 mb-4', isUser && 'flex-row-reverse')}>
+        <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className={cn('flex gap-3 mb-4', isUser && 'flex-row-reverse')}
+        >
             {/* Avatar */}
-            <div
+            <motion.div
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.1 }}
                 className={cn(
                     'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
                     isUser
                         ? 'bg-blue-600 text-white'
-                        : 'bg-gradient-to-br from-violet-500 to-purple-600 text-white',
+                        : 'bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-md shadow-purple-200/50',
                 )}
             >
                 {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
-            </div>
+            </motion.div>
 
             {/* Message bubble */}
             <div className={cn('max-w-[80%] space-y-1', isUser && 'items-end')}>
@@ -41,13 +51,24 @@ export function AiMessage({ role, content, timestamp, isStreaming, usage }: AiMe
                     className={cn(
                         'px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap',
                         isUser
-                            ? 'bg-blue-600 text-white rounded-br-md'
+                            ? 'bg-blue-600 text-white rounded-br-md shadow-sm shadow-blue-200/40'
                             : 'bg-muted text-foreground rounded-bl-md',
                     )}
                 >
-                    {content}
-                    {isStreaming && (
-                        <span className="inline-block w-[2px] h-[1em] bg-violet-500 ml-0.5 align-text-bottom animate-blink" />
+                    {!isUser && isStreaming ? (
+                        <>
+                            <TextMorph charDuration={20} staggerDelay={0.5}>
+                                {content}
+                            </TextMorph>
+                            <span className="inline-block w-[2px] h-[1em] bg-violet-500 ml-0.5 align-text-bottom animate-blink" />
+                        </>
+                    ) : (
+                        <>
+                            {content}
+                            {isStreaming && (
+                                <span className="inline-block w-[2px] h-[1em] bg-violet-500 ml-0.5 align-text-bottom animate-blink" />
+                            )}
+                        </>
                     )}
                 </div>
                 <div
@@ -66,6 +87,6 @@ export function AiMessage({ role, content, timestamp, isStreaming, usage }: AiMe
                     )}
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }

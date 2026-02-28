@@ -5,20 +5,20 @@ import { Slot } from "radix-ui"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive active:scale-[0.98]",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive active:scale-[0.97] active:duration-75 hover:-translate-y-[1px] hover:shadow-md active:translate-y-0 active:shadow-sm",
   {
     variants: {
       variant: {
-        default: "bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm hover:shadow-md",
+        default: "bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm shadow-indigo-200/50 hover:shadow-indigo-300/50",
         destructive:
-          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 shadow-sm",
+          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 shadow-sm shadow-red-200/50",
         outline:
-          "border border-slate-200 bg-background shadow-sm hover:bg-slate-50 hover:text-indigo-600 dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+          "border border-slate-200 bg-background shadow-sm hover:bg-slate-50 hover:text-indigo-600 hover:border-indigo-200 dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
         secondary:
-          "bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-100 shadow-sm",
+          "bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-100 shadow-sm shadow-indigo-100/50",
         ghost:
-          "hover:bg-slate-100 hover:text-indigo-600 dark:hover:bg-accent/50",
-        link: "text-indigo-600 underline-offset-4 hover:underline",
+          "hover:bg-slate-100 hover:text-indigo-600 dark:hover:bg-accent/50 hover:shadow-none hover:-translate-y-0",
+        link: "text-indigo-600 underline-offset-4 hover:underline hover:shadow-none hover:-translate-y-0",
       },
       size: {
         default: "h-10 px-4 py-2 has-[>svg]:px-3",

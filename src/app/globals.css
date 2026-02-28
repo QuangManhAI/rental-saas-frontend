@@ -147,3 +147,103 @@
 @utility animate-blink {
   animation: blink 0.8s step-end infinite;
 }
+
+/* ─── Stripe-inspired Landing Page Styles ─── */
+
+/* Gradient text (Stripe signature style) */
+.stripe-gradient-text {
+  background: linear-gradient(135deg, #635bff 0%, #a259ff 40%, #f06 80%, #ff6b00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Full-page gradient mesh background */
+.stripe-gradient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -30;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 91, 255, 0.08), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 50%, rgba(162, 89, 255, 0.05), transparent),
+    radial-gradient(ellipse 50% 60% at 20% 80%, rgba(99, 91, 255, 0.04), transparent),
+    linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
+}
+
+/* Hero section floating mesh orbs */
+.stripe-mesh-1 {
+  background: radial-gradient(circle, rgba(99, 91, 255, 0.12) 0%, rgba(162, 89, 255, 0.06) 40%, transparent 70%);
+  filter: blur(80px);
+}
+
+.stripe-mesh-2 {
+  background: radial-gradient(circle, rgba(162, 89, 255, 0.08) 0%, rgba(99, 91, 255, 0.04) 50%, transparent 70%);
+  filter: blur(60px);
+}
+
+.stripe-mesh-3 {
+  background: radial-gradient(circle, rgba(99, 91, 255, 0.03) 0%, transparent 60%);
+  filter: blur(100px);
+}
+
+/* ─── Workspace / Dashboard UI Effects ─── */
+
+/* Dropdown menu animations */
+[data-slot="dropdown-menu-content"],
+[data-slot="popover-content"],
+[data-slot="select-content"] {
+  animation: slide-up-fade 0.2s ease-out;
+}
+
+@keyframes slide-up-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Dialog/sheet backdrop animation */
+[data-slot="dialog-overlay"] {
+  animation: overlay-fade 0.2s ease-out;
+}
+
+@keyframes overlay-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Smooth input focus ring animation */
+input:focus,
+textarea:focus,
+select:focus {
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+/* Badge subtle pulse on hover */
+[data-slot="badge"]:hover {
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+/* Table row hover effect */
+[data-slot="table-row"]:hover {
+  background-color: oklch(0.98 0.005 276.966);
+  transition: background-color 0.15s ease;
+}
+
+/* Skeleton shimmer effect enhancement */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+[data-slot="skeleton"] {
+  background: linear-gradient(90deg, oklch(0.96 0 0) 25%, oklch(0.93 0 0) 50%, oklch(0.96 0 0) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
