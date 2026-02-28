@@ -40,7 +40,7 @@ const useStyleInjection = () => {
 const PromptTextarea = React.forwardRef<
     HTMLTextAreaElement,
     React.TextareaHTMLAttributes<HTMLTextAreaElement> & { maxHeight?: number }
->(({ className, maxHeight = 240, onChange, ...props }, ref) => {
+>(({ className, maxHeight = 160, onChange, ...props }, ref) => {
     const innerRef = React.useRef<HTMLTextAreaElement>(null);
     const textareaRef = (ref as React.RefObject<HTMLTextAreaElement>) || innerRef;
 
@@ -55,7 +55,7 @@ const PromptTextarea = React.forwardRef<
         <textarea
             ref={textareaRef}
             className={cn(
-                'flex min-h-[44px] w-full resize-none rounded-md border-none bg-transparent px-3 py-2.5 text-base placeholder:opacity-50 focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50',
+                'flex min-h-[40px] md:min-h-[44px] w-full resize-none rounded-md border-none bg-transparent px-3 py-1.5 md:py-2.5 text-sm md:text-base placeholder:opacity-50 focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50',
                 // Text color adapts to theme
                 'text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500',
                 className,
@@ -274,7 +274,7 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
             <div
                 ref={ref || boxRef}
                 className={cn(
-                    'prompt-input-box rounded-3xl p-2 shadow-lg transition-all duration-300',
+                    'prompt-input-box rounded-2xl md:rounded-3xl p-1.5 md:p-2 shadow-lg transition-all duration-300',
                     // ── Light mode ──
                     'border border-slate-200 bg-slate-50',
                     // ── Dark mode (synced with page theme) ──
@@ -341,7 +341,7 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
                                         ? 'Tạo trên canvas...'
                                         : placeholder
                         }
-                        className="text-base"
+                        className="text-sm md:text-base"
                     />
                 </div>
 
@@ -358,7 +358,7 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
                 )}
 
                 {/* ── Action bar ─── */}
-                <div className="flex items-center justify-between gap-2 p-0 pt-2">
+                <div className="flex items-center justify-between gap-1 md:gap-2 p-0 pt-1.5 md:pt-2">
                     {/* Left actions */}
                     <div
                         className={cn(
@@ -387,7 +387,7 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
                         </button>
 
                         {/* Toggles container */}
-                        <div className="flex items-center">
+                        <div className="hidden md:flex items-center">
                             {/* Search toggle */}
                             <button
                                 type="button"
