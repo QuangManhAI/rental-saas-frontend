@@ -69,7 +69,7 @@ export function BottomNav() {
   const user = useAuthStore((s) => s.user);
 
   // Hide BottomNav on AI agent page — it uses full viewport
-  if (pathname === '/ai-agent') return null;
+  if (pathname.startsWith('/ai-agent')) return null;
 
   const visibleItems = BOTTOM_NAV_ITEMS.filter(
     (item) => !item.roles || (user && item.roles.includes(user.role)),

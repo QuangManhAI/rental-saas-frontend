@@ -18,7 +18,7 @@ export default function DashboardLayout({
   const [mobileOpen, setMobileOpen] = useState(false);
   const collapsed = useSidebarStore((s) => s.collapsed);
   const pathname = usePathname();
-  const isAiAgent = pathname === '/ai-agent';
+  const isAiAgent = pathname.startsWith('/ai-agent');
 
   return (
     <AuthGuard>

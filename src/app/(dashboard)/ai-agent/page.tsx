@@ -104,8 +104,8 @@ export default function AiAgentPage() {
   return (
     <div className={cn(darkMode && 'dark')}>
       {/* Fill remaining viewport — BottomNav is hidden on this page, no 80px offset needed */}
-      {/* Mobile: auto height, capped at viewport. Desktop: fill remaining viewport */}
-      <div className="flex h-auto max-h-[calc(100dvh-64px-32px)] lg:h-[calc(100dvh-64px-48px)] rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm overflow-hidden transition-all duration-200">
+      {/* Mobile: full height up to padding. Desktop: fill remaining viewport */}
+      <div className="flex h-[calc(100dvh-64px-32px)] lg:h-[calc(100dvh-64px-48px)] rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm overflow-hidden transition-all duration-200">
 
         {/* ══════════════ LEFT SIDEBAR — Conversations ══════════════ */}
         <div
