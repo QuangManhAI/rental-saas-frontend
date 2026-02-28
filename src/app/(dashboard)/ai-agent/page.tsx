@@ -16,6 +16,14 @@ import {
   Keyboard,
   PanelLeftClose,
   PanelLeftOpen,
+  UserPlus,
+  FileText,
+  CreditCard,
+  BarChart3,
+  DoorOpen,
+  AlertCircle,
+  CalendarClock,
+  type LucideIcon,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -32,14 +40,14 @@ function getGreeting() {
   return 'tối';
 }
 
-const SUGGESTIONS = [
-  '➕ Thêm khách thuê mới',
-  '📄 Tạo hoá đơn tháng này',
-  '💳 Ghi nhận thanh toán',
-  '📊 Báo cáo doanh thu tháng này',
-  'Phòng nào đang trống?',
-  'Ai chưa thanh toán tháng này?',
-  'Hợp đồng nào sắp hết hạn?',
+const SUGGESTIONS: { icon: LucideIcon; label: string }[] = [
+  { icon: UserPlus, label: 'Thêm khách thuê mới' },
+  { icon: FileText, label: 'Tạo hoá đơn tháng này' },
+  { icon: CreditCard, label: 'Ghi nhận thanh toán' },
+  { icon: BarChart3, label: 'Báo cáo doanh thu tháng này' },
+  { icon: DoorOpen, label: 'Phòng nào đang trống?' },
+  { icon: AlertCircle, label: 'Ai chưa thanh toán tháng này?' },
+  { icon: CalendarClock, label: 'Hợp đồng nào sắp hết hạn?' },
 ];
 
 export default function AiAgentPage() {
@@ -112,7 +120,7 @@ export default function AiAgentPage() {
             sidebarOpen ? 'w-56 md:w-64' : 'w-0',
           )}
         >
-          <div className="flex items-center justify-between px-3 py-3 border-b border-slate-200 dark:border-slate-700 flex-shrink-0">
+          <div className="flex items-center justify-between px-3 h-11 border-b border-slate-200 dark:border-slate-700 flex-shrink-0">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide whitespace-nowrap">
               Hội thoại
             </span>
@@ -165,7 +173,7 @@ export default function AiAgentPage() {
         <div className="flex-1 flex flex-col min-w-0">
 
           {/* ── Header ──────────────────────────────── */}
-          <div className="flex items-center justify-between px-3 py-2 border-b border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-900 flex-shrink-0">
+          <div className="flex items-center justify-between px-3 h-11 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex-shrink-0">
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -236,13 +244,14 @@ export default function AiAgentPage() {
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2 justify-center max-w-lg">
-                  {SUGGESTIONS.map((q) => (
+                  {SUGGESTIONS.map((s) => (
                     <button
-                      key={q}
-                      className="text-xs px-3 py-2 rounded-full border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 hover:bg-violet-50 dark:hover:bg-violet-900/30 hover:border-violet-300 dark:hover:border-violet-600 text-slate-600 dark:text-slate-300 transition-all duration-200"
-                      onClick={() => sendMessage(q)}
+                      key={s.label}
+                      className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-full border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 hover:bg-violet-50 dark:hover:bg-violet-900/30 hover:border-violet-300 dark:hover:border-violet-600 text-slate-600 dark:text-slate-300 transition-all duration-200"
+                      onClick={() => sendMessage(s.label)}
                     >
-                      {q}
+                      <s.icon className="w-3.5 h-3.5 text-violet-500" />
+                      {s.label}
                     </button>
                   ))}
                 </div>
