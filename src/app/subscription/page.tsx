@@ -183,7 +183,7 @@ function UpgradeDialog({ open, onClose, fromPlan, toPlan }: {
   open: boolean; onClose: () => void; fromPlan: string; toPlan: string;
 }) {
   const [months, setMonths] = useState(1);
-  const [method, setMethod] = useState<'momo' | 'bank_transfer'>('bank_transfer');
+  const [method, setMethod] = useState<'momo' | 'bank_transfer'>('momo');
   const qc = useQueryClient();
 
   const plan = PLANS.find((p) => p.key === toPlan)!;
