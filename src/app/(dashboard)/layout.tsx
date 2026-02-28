@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { AuthGuard } from '@/components/shared/auth-guard';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Topbar } from '@/components/layout/topbar';
@@ -16,6 +17,8 @@ export default function DashboardLayout({
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const collapsed = useSidebarStore((s) => s.collapsed);
+  const pathname = usePathname();
+  const isAiAgent = pathname === '/ai-agent';
 
   return (
     <AuthGuard>
@@ -32,7 +35,7 @@ export default function DashboardLayout({
           )}
         >
           <Topbar onMenuClick={() => setMobileOpen(true)} />
-          <main className="p-4 pb-20 lg:pb-6 lg:p-6">
+          <main className={cn('p-4 lg:pb-6 lg:p-6', isAiAgent ? 'pb-4' : 'pb-20')}>
             <div className="mx-auto max-w-7xl">{children}</div>
           </main>
         </div>
