@@ -331,7 +331,7 @@ export default function AiAgentPage() {
           </div>
 
           {/* ── Input — PromptInputBox ───────────────── */}
-          <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-900 flex-shrink-0">
+          <div className="px-3 py-2 md:px-4 md:py-3 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-900 flex-shrink-0">
             <PromptInputBox
               onSend={(message) => handleSend(message)}
               isLoading={isLoading}
