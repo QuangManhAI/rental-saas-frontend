@@ -348,10 +348,13 @@ function StarRating({ count }: { count: number }) {
 function GradientOrb({
   className,
   color = 'indigo',
+  mobile,
 }: {
   className?: string;
   color?: string;
+  mobile?: boolean;
 }) {
+  if (mobile) return null; // Skip heavy blur elements on mobile
   const colorMap: Record<string, string> = {
     indigo: 'bg-indigo-400/40',
     violet: 'bg-violet-400/40',
@@ -389,16 +392,16 @@ export default function LandingPage() {
 
   return (
     <MotionConfig reducedMotion={isMobile ? 'always' : 'never'}>
-    <div className="min-h-screen bg-white text-gray-900 antialiased overflow-x-hidden relative">
+    <div className={`min-h-screen bg-white text-gray-900 antialiased overflow-x-hidden relative ${isMobile ? 'landing-perf' : ''}`}>
       {/* ── Stripe-style gradient mesh background ── */}
       <div className="stripe-gradient-bg" aria-hidden />
 
       {/* ── Navbar ── */}
       <motion.nav
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="sticky top-0 z-50 backdrop-blur-2xl bg-white/70 border-b border-gray-200/40"
+        initial={isMobile ? false : { y: -20, opacity: 0 }}
+        animate={isMobile ? undefined : { y: 0, opacity: 1 }}
+        transition={isMobile ? undefined : { duration: 0.5 }}
+        className={`sticky top-0 z-50 border-b border-gray-200/40 ${isMobile ? 'bg-white' : 'backdrop-blur-2xl bg-white/70'}`}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
@@ -690,7 +693,7 @@ export default function LandingPage() {
 
       {/* ── Pain Points ── */}
       <section className="pt-20 sm:pt-28 pb-20 sm:pb-28 relative">
-        <GradientOrb className="w-[500px] h-[500px] top-0 left-1/2 -translate-x-1/2" color="purple" />
+        <GradientOrb mobile={isMobile} className="w-[500px] h-[500px] top-0 left-1/2 -translate-x-1/2" color="purple" />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
           <AnimatedSection mobile={isMobile}>
             <motion.div variants={fadeUp} className="text-center mb-14">
@@ -738,7 +741,7 @@ export default function LandingPage() {
 
       {/* ── Features ── */}
       <section id="features" className="py-20 sm:py-28 bg-gray-50/80 border-y border-gray-200/60 relative">
-        <GradientOrb className="w-[400px] h-[400px] top-20 -right-20" color="blue" />
+        <GradientOrb mobile={isMobile} className="w-[400px] h-[400px] top-20 -right-20" color="blue" />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
           <AnimatedSection mobile={isMobile}>
             <motion.div variants={fadeUp} className="text-center mb-14">
@@ -784,8 +787,8 @@ export default function LandingPage() {
 
       {/* ── Feature Showcase (alternating) ── */}
       <section className="py-20 sm:py-28 relative overflow-hidden">
-        <GradientOrb className="w-[600px] h-[600px] -left-40 top-30" color="indigo" />
-        <GradientOrb className="w-[400px] h-[400px] right-0 bottom-20 top-120" color="violet" />
+        <GradientOrb mobile={isMobile} className="w-[600px] h-[600px] -left-40 top-30" color="indigo" />
+        <GradientOrb mobile={isMobile} className="w-[400px] h-[400px] right-0 bottom-20 top-120" color="violet" />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-24 relative">
           {/* Row 1 — Invoice */}
@@ -1032,7 +1035,7 @@ export default function LandingPage() {
 
       {/* ── Pricing ── */}
       <section id="pricing" className="py-20 sm:py-28 bg-gray-50/80 border-b border-gray-200/60 relative">
-        <GradientOrb className="w-[500px] h-[500px] -right-20 top-1/2 -translate-y-1/2" color="indigo" />
+        <GradientOrb mobile={isMobile} className="w-[500px] h-[500px] -right-20 top-1/2 -translate-y-1/2" color="indigo" />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
           <AnimatedSection mobile={isMobile}>
             <motion.div variants={fadeUp} className="text-center mb-14">
