@@ -208,13 +208,15 @@ export default function AdminSubscriptionsPage() {
                 {subs.map((sub) => (
                   <tr key={sub._id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">
-                      {typeof sub.ownerId === 'object' ? (
+                      {sub.ownerId && typeof sub.ownerId === 'object' ? (
                         <div>
                           <p className="text-sm font-medium text-gray-900">{(sub.ownerId as PopulatedOwner).fullName}</p>
                           <p className="text-xs text-gray-400">{(sub.ownerId as PopulatedOwner).email}</p>
                         </div>
+                      ) : sub.ownerId ? (
+                        <span className="font-mono text-xs text-gray-500">{(sub.ownerId as string).slice(-8)}...</span>
                       ) : (
-                        <span className="font-mono text-xs text-gray-500">{sub.ownerId.slice(-8)}...</span>
+                        <span className="text-xs text-gray-400">—</span>
                       )}
                     </td>
                     <td className="px-4 py-3">

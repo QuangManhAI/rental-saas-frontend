@@ -16,14 +16,14 @@ function StatCard({
   sub?: string;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
+      <div className="flex items-center justify-between mb-3">
         <p className="text-sm text-gray-500">{label}</p>
-        <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center">
-          <Icon className="w-5 h-5 text-indigo-600" />
+        <div className="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center">
+          <Icon className="w-4 h-4 text-indigo-600" />
         </div>
       </div>
-      <p className="text-3xl font-bold text-gray-900">
+      <p className="text-2xl md:text-3xl font-bold text-gray-900">
         {typeof value === 'number' && label.toLowerCase().includes('doanh')
           ? value.toLocaleString('vi-VN') + ' ₫'
           : value.toLocaleString('vi-VN')}
@@ -71,7 +71,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-sm text-gray-500 mt-1">Tổng quan hệ thống RentalSaaS</p>
       </div>
 
@@ -96,7 +96,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Plan Breakdown */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
         <h2 className="text-base font-semibold text-gray-900 mb-4">Phân bổ gói dịch vụ</h2>
         <div className="flex flex-wrap gap-3">
           {Object.entries(stats.planBreakdown).length === 0 ? (
@@ -115,45 +115,69 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Recent Users */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
         <h2 className="text-base font-semibold text-gray-900 mb-4">Chủ trọ mới đăng ký</h2>
         {stats.recentUsers.length === 0 ? (
           <p className="text-sm text-gray-400">Chưa có người dùng nào.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="text-left py-2 pr-4 text-gray-500 font-medium">Tên</th>
-                  <th className="text-left py-2 pr-4 text-gray-500 font-medium">Email</th>
-                  <th className="text-left py-2 pr-4 text-gray-500 font-medium">Trạng thái</th>
-                  <th className="text-left py-2 text-gray-500 font-medium">Ngày đăng ký</th>
-                </tr>
-              </thead>
-              <tbody>
-                {stats.recentUsers.map((u) => (
-                  <tr key={u._id} className="border-b border-gray-50 hover:bg-gray-50">
-                    <td className="py-3 pr-4 font-medium text-gray-900">{u.fullName || '—'}</td>
-                    <td className="py-3 pr-4 text-gray-600">{u.email}</td>
-                    <td className="py-3 pr-4">
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                          u.isActive
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-red-100 text-red-700'
-                        }`}
-                      >
-                        {u.isActive ? 'Hoạt động' : 'Khóa'}
-                      </span>
-                    </td>
-                    <td className="py-3 text-gray-500">
-                      {new Date(u.createdAt).toLocaleDateString('vi-VN')}
-                    </td>
+          <>
+            {/* Mobile card list */}
+            <div className="md:hidden space-y-3">
+              {stats.recentUsers.map((u) => (
+                <div key={u._id} className="border border-gray-100 rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="font-medium text-gray-900 text-sm truncate pr-2">{u.fullName || '—'}</p>
+                    <span
+                      className={`flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        u.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                      }`}
+                    >
+                      {u.isActive ? 'Hoạt động' : 'Khóa'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 truncate">{u.email}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {new Date(u.createdAt).toLocaleDateString('vi-VN')}
+                  </p>
+                </div>
+              ))}
+            </div>
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100">
+                    <th className="text-left py-2 pr-4 text-gray-500 font-medium">Tên</th>
+                    <th className="text-left py-2 pr-4 text-gray-500 font-medium">Email</th>
+                    <th className="text-left py-2 pr-4 text-gray-500 font-medium">Trạng thái</th>
+                    <th className="text-left py-2 text-gray-500 font-medium">Ngày đăng ký</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {stats.recentUsers.map((u) => (
+                    <tr key={u._id} className="border-b border-gray-50 hover:bg-gray-50">
+                      <td className="py-3 pr-4 font-medium text-gray-900">{u.fullName || '—'}</td>
+                      <td className="py-3 pr-4 text-gray-600">{u.email}</td>
+                      <td className="py-3 pr-4">
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                            u.isActive
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-red-100 text-red-700'
+                          }`}
+                        >
+                          {u.isActive ? 'Hoạt động' : 'Khóa'}
+                        </span>
+                      </td>
+                      <td className="py-3 text-gray-500">
+                        {new Date(u.createdAt).toLocaleDateString('vi-VN')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>
