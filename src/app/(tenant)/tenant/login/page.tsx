@@ -59,9 +59,13 @@ export default function TenantLoginPage() {
     setLoginLoading(true);
 
     try {
-      const { accessToken, tenant } = await tenantAuthService.login(email, password);
-      setAuth(accessToken, tenant);
-      router.replace('/tenant');
+      const { accessToken, tenant, mustChangePassword } = await tenantAuthService.login(email, password);
+      setAuth(accessToken, tenant, mustChangePassword);
+      if (mustChangePassword) {
+        router.replace('/tenant/change-password');
+      } else {
+        router.replace('/tenant');
+      }
     } catch (err: any) {
       const msg = err?.response?.data?.message || 'Đăng nhập thất bại. Vui lòng thử lại.';
       setLoginError(msg);

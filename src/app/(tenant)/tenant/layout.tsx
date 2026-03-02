@@ -41,21 +41,28 @@ function TenantBottomNav() {
 
 export default function TenantLayout({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useTenantAuthStore((s) => s.isAuthenticated);
+  const mustChangePassword = useTenantAuthStore((s) => s.mustChangePassword);
   const router = useRouter();
   const pathname = usePathname();
 
   // Public pages that don't require authentication
   const publicPaths = ['/tenant/login', '/tenant/activate', '/tenant/forgot-password'];
   const isPublicPage = publicPaths.some((p) => pathname.startsWith(p));
+  const isChangePasswordPage = pathname === '/tenant/change-password';
 
   useEffect(() => {
-    if (!isAuthenticated && !isPublicPage) {
+    if (!isAuthenticated && !isPublicPage && !isChangePasswordPage) {
       router.replace('/tenant/login');
+      return;
     }
-  }, [isAuthenticated, pathname, router, isPublicPage]);
+    // Enforce password change — block access to other pages
+    if (isAuthenticated && mustChangePassword && !isChangePasswordPage) {
+      router.replace('/tenant/change-password');
+    }
+  }, [isAuthenticated, mustChangePassword, pathname, router, isPublicPage, isChangePasswordPage]);
 
-  // Show public pages without the layout shell
-  if (isPublicPage) {
+  // Show public pages and change-password page without the layout shell
+  if (isPublicPage || isChangePasswordPage) {
     return <>{children}</>;
   }
 

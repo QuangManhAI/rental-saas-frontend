@@ -14,8 +14,10 @@ interface TenantAuthState {
   accessToken: string | null;
   tenant: TenantProfile | null;
   isAuthenticated: boolean;
+  mustChangePassword: boolean;
 
-  setAuth: (token: string, tenant: TenantProfile) => void;
+  setAuth: (token: string, tenant: TenantProfile, mustChangePassword?: boolean) => void;
+  clearMustChangePassword: () => void;
   logout: () => void;
 }
 
@@ -25,12 +27,16 @@ export const useTenantAuthStore = create<TenantAuthState>()(
       accessToken: null,
       tenant: null,
       isAuthenticated: false,
+      mustChangePassword: false,
 
-      setAuth: (token, tenant) =>
-        set({ accessToken: token, tenant, isAuthenticated: true }),
+      setAuth: (token, tenant, mustChangePassword = false) =>
+        set({ accessToken: token, tenant, isAuthenticated: true, mustChangePassword }),
+
+      clearMustChangePassword: () =>
+        set({ mustChangePassword: false }),
 
       logout: () =>
-        set({ accessToken: null, tenant: null, isAuthenticated: false }),
+        set({ accessToken: null, tenant: null, isAuthenticated: false, mustChangePassword: false }),
     }),
     {
       name: 'tenant-auth-storage',

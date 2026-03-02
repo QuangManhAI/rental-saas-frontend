@@ -40,6 +40,7 @@ export interface VerifyTokenResponse {
 
 export interface LoginResponse {
   accessToken: string;
+  mustChangePassword: boolean;
   tenant: {
     fullName: string;
     email?: string;
@@ -67,6 +68,10 @@ export const tenantAuthService = {
   /** Verify OTP and set new password */
   verifyForgotPasswordOtp: (email: string, code: string, newPassword: string): Promise<{ message: string }> =>
     api.post<{ data: { message: string } }>('/tenant-auth/forgot-password/verify-otp', { email, code, newPassword }).then((r) => r.data.data),
+
+  /** Change password on first login (authenticated, no OTP) */
+  changeInitialPassword: (newPassword: string, confirmPassword: string): Promise<{ message: string }> =>
+    tenantApi.post<{ data: { message: string } }>('/tenant-auth/change-initial-password', { newPassword, confirmPassword }).then((r) => r.data.data),
 
   /** Get tenant profile using tenant JWT */
   getProfile: (): Promise<TenantProfile> =>
