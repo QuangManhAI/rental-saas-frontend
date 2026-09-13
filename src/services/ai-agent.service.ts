@@ -101,7 +101,7 @@ export const aiAgentService = {
             }
         } catch { /* noop */ }
 
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api/v1';
 
         fetch(`${apiUrl}${BASE}/conversations/${conversationId}/messages/stream`, {
             method: 'POST',

@@ -163,7 +163,7 @@ export default function TenantBillDetailPage() {
 
       {/* Download invoice */}
       <a
-        href={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') ?? 'http://localhost:3000'}/api/v1/bills/${id}/invoice`}
+        href={`${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api/v1'}/bills/${id}/invoice`}
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center justify-center gap-2 w-full rounded-xl border border-indigo-200 bg-indigo-50 text-indigo-700 font-medium text-sm py-3 active:bg-indigo-100"
