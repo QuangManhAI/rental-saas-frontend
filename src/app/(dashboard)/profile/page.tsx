@@ -24,7 +24,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { LoadingSkeleton } from '@/components/shared';
+import { LoadingSkeleton, TelegramLinkDialog } from '@/components/shared';
 
 import { useAuthStore } from '@/stores/auth.store';
 import { useProfile } from '@/hooks/use-auth';
@@ -458,11 +458,8 @@ function SecurityTab({ user }: { user: any }) {
 }
 
 function NotificationsTab({ user }: { user: any }) {
-  // Construct Telegram link URL from user's ownerId (or user._id)
   const ownerId = user?.ownerId || user?._id;
-  const telegramLinkUrl = ownerId
-    ? `https://t.me/quangManhAI_bot?start=owner_${ownerId}`
-    : '';
+  const [telegramDialogOpen, setTelegramDialogOpen] = useState(false);
 
   const [notifSettings, setNotifSettings] = useState({
     dailyReport: true,
@@ -473,62 +470,62 @@ function NotificationsTab({ user }: { user: any }) {
   // Mock checking if linked (based on user data if provided, or assuming not linked for demo if field missing)
   const isTelegramLinked = !!user.telegramChatId;
 
-  const handleLinkTelegram = () => {
-    if (telegramLinkUrl) {
-      window.open(telegramLinkUrl, '_blank');
-      toast.info('Mở Telegram để liên kết. Nhấn START trong bot!');
-    }
-  };
-
   return (
-    <Card className="border-slate-200 shadow-sm">
-      <CardHeader>
-        <CardTitle>Thông báo & Tích hợp</CardTitle>
-        <CardDescription>Cấu hình cách bạn nhận thông báo từ hệ thống.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-8">
+    <>
+      <TelegramLinkDialog
+        open={telegramDialogOpen}
+        onOpenChange={setTelegramDialogOpen}
+        ownerId={ownerId}
+      />
 
-        {/* Telegram Integration */}
-        <div className="bg-indigo-50/50 border border-indigo-100 rounded-lg p-5">
-          <div className="flex items-start justify-between">
-            <div className="flex gap-4">
-              <div className="flex h-12 w-12 items-center justify-center bg-white rounded-full shadow-sm shrink-0">
-                <Send className="h-6 w-6 text-blue-500" />
+      <Card className="border-slate-200 shadow-sm">
+        <CardHeader>
+          <CardTitle>Thông báo & Tích hợp</CardTitle>
+          <CardDescription>Cấu hình cách bạn nhận thông báo từ hệ thống.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-8">
+
+          {/* Telegram Integration */}
+          <div className="bg-indigo-50/50 border border-indigo-100 rounded-lg p-5">
+            <div className="flex items-start justify-between">
+              <div className="flex gap-4">
+                <div className="flex h-12 w-12 items-center justify-center bg-white rounded-full shadow-sm shrink-0">
+                  <Send className="h-6 w-6 text-blue-500" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-slate-900 flex items-center gap-2">
+                    Telegram
+                    {isTelegramLinked ? (
+                      <Badge variant="default" className="bg-green-600 hover:bg-green-700 h-5 px-1.5 text-[10px]">Đã liên kết</Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-slate-500 h-5 px-1.5 text-[10px]">Chưa liên kết</Badge>
+                    )}
+                  </h3>
+                  <p className="text-sm text-slate-600 mt-1 max-w-sm">
+                    Nhận báo cáo doanh thu hàng tháng và thông báo quan trọng trực tiếp qua Telegram.
+                  </p>
+
+                  {isTelegramLinked && (
+                    <div className="mt-3 flex items-center gap-2 text-sm text-indigo-700 font-medium">
+                      <CheckCircle2 className="h-4 w-4" />
+                      Chat ID: {user.telegramChatId}
+                    </div>
+                  )}
+                </div>
               </div>
               <div>
-                <h3 className="font-medium text-slate-900 flex items-center gap-2">
-                  Telegram
-                  {isTelegramLinked ? (
-                    <Badge variant="default" className="bg-green-600 hover:bg-green-700 h-5 px-1.5 text-[10px]">Đã liên kết</Badge>
-                  ) : (
-                    <Badge variant="outline" className="text-slate-500 h-5 px-1.5 text-[10px]">Chưa liên kết</Badge>
-                  )}
-                </h3>
-                <p className="text-sm text-slate-600 mt-1 max-w-sm">
-                  Nhận báo cáo doanh thu hàng tháng và thông báo quan trọng trực tiếp qua Telegram.
-                </p>
-
-                {isTelegramLinked && (
-                  <div className="mt-3 flex items-center gap-2 text-sm text-indigo-700 font-medium">
-                    <CheckCircle2 className="h-4 w-4" />
-                    Chat ID: {user.telegramChatId}
-                  </div>
+                {isTelegramLinked ? (
+                  <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200">
+                    <LogOut className="mr-2 h-3 w-3" /> Hủy liên kết
+                  </Button>
+                ) : (
+                  <Button size="sm" onClick={() => setTelegramDialogOpen(true)} className="bg-blue-500 hover:bg-blue-600 text-white">
+                    Kết nối ngay
+                  </Button>
                 )}
               </div>
             </div>
-            <div>
-              {isTelegramLinked ? (
-                <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200">
-                  <LogOut className="mr-2 h-3 w-3" /> Hủy liên kết
-                </Button>
-              ) : (
-                <Button size="sm" onClick={handleLinkTelegram} className="bg-blue-500 hover:bg-blue-600 text-white">
-                  Kết nối ngay
-                </Button>
-              )}
-            </div>
           </div>
-        </div>
 
         <div className="space-y-4">
           <h3 className="text-sm font-medium text-slate-900 uppercase tracking-wider">Cài đặt thông báo</h3>
@@ -575,5 +572,6 @@ function NotificationsTab({ user }: { user: any }) {
 
       </CardContent>
     </Card>
+    </>
   );
 }

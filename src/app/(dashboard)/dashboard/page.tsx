@@ -46,7 +46,7 @@ import {
   CalendarDays,
   Info,
 } from 'lucide-react';
-import { LoadingSkeleton } from '@/components/shared';
+import { LoadingSkeleton, TelegramLinkDialog } from '@/components/shared';
 import DashboardAnalytics from '@/components/dashboard/DashboardAnalytics';
 import { toast } from 'sonner';
 import { ROUTES } from '@/constants';
@@ -90,17 +90,10 @@ export default function DashboardPage() {
   };
 
   const ownerId = user?.ownerId || user?._id;
-  const telegramLinkUrl = ownerId
-    ? `https://t.me/quangManhAI_bot?start=owner_${ownerId}`
-    : '';
+  const [telegramDialogOpen, setTelegramDialogOpen] = useState(false);
 
   const handleLinkTelegram = () => {
-    if (telegramLinkUrl) {
-      window.open(telegramLinkUrl, '_blank');
-      toast.info('Mở Telegram để liên kết. Nhấn START trong bot!');
-    } else {
-      toast.error('Không tìm thấy thông tin người dùng');
-    }
+    setTelegramDialogOpen(true);
   };
 
   const handleConfirmReport = async () => {
@@ -223,6 +216,12 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      <TelegramLinkDialog
+        open={telegramDialogOpen}
+        onOpenChange={setTelegramDialogOpen}
+        ownerId={ownerId}
+      />
+
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
