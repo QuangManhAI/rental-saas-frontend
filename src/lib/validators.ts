@@ -124,7 +124,7 @@ export type UserUpdateFormValues = z.infer<typeof userUpdateSchema>;
 export const createNotificationSchema = z.object({
   title: z.string().min(1, 'Tiêu đề thông báo là bắt buộc').max(150, 'Tiêu đề tối đa 150 ký tự'),
   message: z.string().min(1, 'Nội dung thông báo là bắt buộc').max(2000, 'Nội dung tối đa 2000 ký tự'),
-  type: z.nativeEnum(NotificationType).default(NotificationType.INFO),
+  type: z.nativeEnum(NotificationType),
   link: z.string().optional().or(z.literal('')),
 });
 export type CreateNotificationFormValues = z.infer<typeof createNotificationSchema>;
