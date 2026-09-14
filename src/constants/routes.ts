@@ -59,6 +59,9 @@ export const ROUTES = {
   // Profile
   PROFILE: '/profile',
 
+  // Notifications
+  NOTIFICATIONS: '/notifications',
+
   // Subscription
   SUBSCRIPTION: '/subscription',
 } as const;

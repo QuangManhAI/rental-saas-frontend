@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { RoomStatus, PaymentMethod } from '@/types/enums';
+import { RoomStatus, PaymentMethod, NotificationType } from '@/types/enums';
 
 // ──────────────────────────────────────────────
 // Auth
@@ -116,3 +116,15 @@ export type UserFormValues = z.infer<typeof userSchema>;
 
 export const userUpdateSchema = userSchema.partial().omit({ email: true });
 export type UserUpdateFormValues = z.infer<typeof userUpdateSchema>;
+
+// ──────────────────────────────────────────────
+// Notifications
+// ──────────────────────────────────────────────
+
+export const createNotificationSchema = z.object({
+  title: z.string().min(1, 'Tiêu đề thông báo là bắt buộc').max(150, 'Tiêu đề tối đa 150 ký tự'),
+  message: z.string().min(1, 'Nội dung thông báo là bắt buộc').max(2000, 'Nội dung tối đa 2000 ký tự'),
+  type: z.nativeEnum(NotificationType).default(NotificationType.INFO),
+  link: z.string().optional().or(z.literal('')),
+});
+export type CreateNotificationFormValues = z.infer<typeof createNotificationSchema>;

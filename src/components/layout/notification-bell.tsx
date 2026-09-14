@@ -118,6 +118,19 @@ export function NotificationBell() {
             </DropdownMenuItem>
           ))
         )}
+
+        {/* Footer */}
+        <DropdownMenuSeparator />
+        <div className="p-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-center text-xs font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 h-8"
+            onClick={() => router.push(ROUTES.NOTIFICATIONS)}
+          >
+            Xem tất cả & quản lý thông báo
+          </Button>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );

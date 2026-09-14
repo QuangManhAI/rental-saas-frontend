@@ -41,3 +41,11 @@ export enum PaymentStatus {
   FAILED = 'FAILED',
 }
 
+export enum NotificationType {
+  INFO = 'INFO',
+  NEW_BILL = 'NEW_BILL',
+  BILL_DUE = 'BILL_DUE',
+  PAYMENT_RECEIVED = 'PAYMENT_RECEIVED',
+  CONTRACT_EXPIRING = 'CONTRACT_EXPIRING',
+}
+

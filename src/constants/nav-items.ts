@@ -9,6 +9,7 @@ import {
   UserCog,
   Settings,
   Sparkles,
+  Bell,
   type LucideIcon,
 } from 'lucide-react';
 import { ROUTES } from './routes';
@@ -62,6 +63,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Trợ lý AI',
     href: ROUTES.AI_AGENT,
     icon: Sparkles,
+  },
+  {
+    label: 'Thông báo',
+    href: ROUTES.NOTIFICATIONS,
+    icon: Bell,
+    roles: [Role.OWNER],
   },
   {
     label: 'Cài đặt TT',
