@@ -458,9 +458,10 @@ function SecurityTab({ user }: { user: any }) {
 }
 
 function NotificationsTab({ user }: { user: any }) {
-  // Construct Telegram link URL from user's ownerId
-  const telegramLinkUrl = user?.ownerId
-    ? `https://t.me/quangManhAI_bot?start=owner_${user.ownerId}`
+  // Construct Telegram link URL from user's ownerId (or user._id)
+  const ownerId = user?.ownerId || user?._id;
+  const telegramLinkUrl = ownerId
+    ? `https://t.me/quangManhAI_bot?start=owner_${ownerId}`
     : '';
 
   const [notifSettings, setNotifSettings] = useState({

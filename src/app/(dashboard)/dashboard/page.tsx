@@ -89,8 +89,9 @@ export default function DashboardPage() {
     setDialogOpen(true);
   };
 
-  const telegramLinkUrl = user?.ownerId
-    ? `https://t.me/quangManhAI_bot?start=owner_${user.ownerId}`
+  const ownerId = user?.ownerId || user?._id;
+  const telegramLinkUrl = ownerId
+    ? `https://t.me/quangManhAI_bot?start=owner_${ownerId}`
     : '';
 
   const handleLinkTelegram = () => {
