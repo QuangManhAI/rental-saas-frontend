@@ -20,6 +20,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import { useI18nStore } from '@/stores/i18n.store';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/constants';
 
 export function NotificationBell() {
   const { t } = useTranslation();
