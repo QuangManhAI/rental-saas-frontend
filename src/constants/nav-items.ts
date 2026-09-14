@@ -68,7 +68,6 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Thông báo',
     href: ROUTES.NOTIFICATIONS,
     icon: Bell,
-    roles: [Role.OWNER],
   },
   {
     label: 'Cài đặt TT',

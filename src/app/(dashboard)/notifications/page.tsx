@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/select';
 import { CreateNotificationDialog } from '@/components/notifications/create-notification-dialog';
 import { useI18nStore } from '@/stores/i18n.store';
+import { useAuthStore } from '@/stores/auth.store';
 import { NotificationType, Role } from '@/types/enums';
 import {
   Plus,
@@ -51,6 +52,9 @@ import {
 import { cn } from '@/lib/utils';
 
 export default function NotificationsPage() {
+  const user = useAuthStore((s) => s.user);
+  const isOwner = user?.role === Role.OWNER;
+
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'unread' | 'read'>('all');
@@ -138,15 +142,19 @@ export default function NotificationsPage() {
   };
 
   return (
-    <RoleGuard roles={[Role.OWNER]}>
+    <RoleGuard roles={[Role.OWNER, Role.STAFF]}>
       <div className="space-y-6">
         {/* Header */}
         <PageHeader
           title="Thông báo"
-          description="Quản lý và phát thông báo hệ thống tới người thuê"
-          actionLabel="Tạo thông báo"
-          actionIcon={Plus}
-          onAction={() => setOpenCreateDialog(true)}
+          description={
+            isOwner
+              ? 'Quản lý và phát thông báo hệ thống tới người thuê'
+              : 'Theo dõi và quản lý thông báo hệ thống'
+          }
+          actionLabel={isOwner ? 'Tạo thông báo' : undefined}
+          actionIcon={isOwner ? Plus : undefined}
+          onAction={isOwner ? () => setOpenCreateDialog(true) : undefined}
         >
           {unreadCount > 0 && (
             <Button
@@ -284,16 +292,22 @@ export default function NotificationsPage() {
           <div className="bg-white rounded-xl border border-slate-200 p-8 text-center shadow-sm">
             <EmptyState
               title="Chưa có thông báo nào"
-              description="Bạn chưa tạo thông báo nào. Nhấn 'Tạo thông báo' để bắt đầu phát tin cho hệ thống hoặc khách thuê."
+              description={
+                isOwner
+                  ? "Bạn chưa tạo thông báo nào. Nhấn 'Tạo thông báo' để bắt đầu phát tin cho hệ thống hoặc khách thuê."
+                  : 'Hiện tại chưa có thông báo nào trong hệ thống.'
+              }
               icon={<Bell className="h-12 w-12 text-indigo-400" />}
             />
-            <Button
-              onClick={() => setOpenCreateDialog(true)}
-              className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white"
-            >
-              <Plus className="mr-1.5 h-4 w-4" />
-              Tạo thông báo đầu tiên
-            </Button>
+            {isOwner && (
+              <Button
+                onClick={() => setOpenCreateDialog(true)}
+                className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white"
+              >
+                <Plus className="mr-1.5 h-4 w-4" />
+                Tạo thông báo đầu tiên
+              </Button>
+            )}
           </div>
         ) : filteredNotifications.length === 0 ? (
           <div className="bg-white rounded-xl border border-slate-200 p-12 text-center shadow-sm">
@@ -407,12 +421,14 @@ export default function NotificationsPage() {
                       </Button>
                     )}
 
-                    <ConfirmDialog
-                      title="Xoá thông báo này?"
-                      description="Thông báo sẽ bị gỡ bỏ vĩnh viễn khỏi danh sách."
-                      onConfirm={() => deleteMut.mutate(item._id)}
-                      loading={deleteMut.isPending}
-                    />
+                    {isOwner && (
+                      <ConfirmDialog
+                        title="Xoá thông báo này?"
+                        description="Thông báo sẽ bị gỡ bỏ vĩnh viễn khỏi danh sách."
+                        onConfirm={() => deleteMut.mutate(item._id)}
+                        loading={deleteMut.isPending}
+                      />
+                    )}
                   </div>
                 </div>
               );
@@ -420,11 +436,13 @@ export default function NotificationsPage() {
           </div>
         )}
 
-        {/* Create Dialog Modal */}
-        <CreateNotificationDialog
-          open={openCreateDialog}
-          onOpenChange={setOpenCreateDialog}
-        />
+        {/* Create Dialog Modal - only for Owner */}
+        {isOwner && (
+          <CreateNotificationDialog
+            open={openCreateDialog}
+            onOpenChange={setOpenCreateDialog}
+          />
+        )}
       </div>
     </RoleGuard>
   );
